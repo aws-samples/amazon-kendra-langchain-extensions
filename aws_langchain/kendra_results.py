@@ -11,7 +11,7 @@ def get_top_n_results(resp, count):
     doc_title = r["DocumentTitle"]["Text"]
     doc_uri = r["DocumentURI"]
     r_type = r["Type"]
-    if r["AdditionalAttributes"]:
+    if (r["AdditionalAttributes"] and r["AdditionalAttributes"][0]["Key"] == "AnswerText"):
         res_text = r["AdditionalAttributes"][0]["Value"]["TextWithHighlightsValue"]["Text"]
     else:
         res_text = r["DocumentExcerpt"]["Text"]
