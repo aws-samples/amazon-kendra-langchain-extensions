@@ -22,7 +22,7 @@ def build_chain():
     If the AI does not know the answer to a question, it truthfully says it 
     does not know.
     {context}
-    Instruction: Based on the above documents, provide a detailed answer for, {question} Answer "don't know" if not present in the document. Solution:
+    Question: Based on the above documents, provide a detailed answer for, {question} Answer "don't know" if not present in the document. Answer:
     """
     PROMPT = PromptTemplate(
         template=prompt_template, input_variables=["context", "question"]
