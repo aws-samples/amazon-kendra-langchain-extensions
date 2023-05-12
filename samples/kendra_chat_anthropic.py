@@ -23,19 +23,28 @@ def build_chain():
   region = os.environ["AWS_REGION"]
   kendra_index_id = os.environ["KENDRA_INDEX_ID"]
 
-  llm = Anthropic(temperature=0, anthropic_api_key=ANTHROPIC_API_KEY)
+  llm = Anthropic(temperature=0, anthropic_api_key=ANTHROPIC_API_KEY, max_tokens_to_sample = 512)
       
   retriever = KendraIndexRetriever(kendraindex=kendra_index_id, 
       awsregion=region, 
       return_source_documents=True)
 
   prompt_template = """
-  The following is a friendly conversation between a human and an AI. 
-  The AI is talkative and provides lots of specific details from its context.
+
+  Human: This is a friendly conversation between a human and an AI. 
+  The AI is talkative and provides specific details from its context but limits it to 240 tokens.
   If the AI does not know the answer to a question, it truthfully says it 
   does not know.
+
+  Assistant: OK, got it, I'll be a talkative truthful AI assistant.
+
+  Human: Here are a few documents in <documents> tags:
+  <documents>
   {context}
-  Question: Based on the above documents, provide a detailed answer for, {question} Answer "don't know" if not present in the document. Answer:
+  </documents>
+  Based on the above documents, provide a detailed answer for, {question} Answer "don't know" if not present in the document. 
+
+Assistant:
   """
   PROMPT = PromptTemplate(
       template=prompt_template, input_variables=["context", "question"]
