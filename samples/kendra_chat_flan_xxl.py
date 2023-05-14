@@ -30,7 +30,7 @@ def build_chain():
       accepts = "application/json"
 
       def transform_input(self, prompt: str, model_kwargs: dict) -> bytes:
-          input_str = json.dumps({"inputs": prompt, "parameters": model_kwargs})
+          input_str = json.dumps({"text_inputs": prompt, **model_kwargs})
           return input_str.encode('utf-8')
       
       def transform_output(self, output: bytes) -> str:
