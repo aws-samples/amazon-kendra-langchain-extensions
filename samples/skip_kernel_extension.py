@@ -1,7 +1,8 @@
 """
-Custom kernel extension to skill cell execution
+Custom kernel extension to add %%skip magic and control cell execution
 
 Adapted from
+https://github.com/ipython/ipython/issues/11582
 https://stackoverflow.com/questions/26494747/simple-way-to-choose-which-cells-to-run-in-ipython-notebook-during-run-all
 """
 
