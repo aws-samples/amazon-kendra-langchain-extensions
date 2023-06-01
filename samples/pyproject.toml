@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aws_langchain"
+version = "0.0.1"
+description = "Langchain utility classes to aid working with AWS services"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+    "langchain==0.0.137",
+    "boto3",
+    "html2text"
+]
+
+[project.optional-dependencies]
+samples = [
+    "openai",
+    "anthropic",
+    "streamlit"
+]
+
+dev = [
+    "openai",
+    "anthropic",
+    "streamlit"
+]
+
+[project.urls]
+"Homepage" = "https://gitlab.aws.dev/langchain/aws-langchain"
+"Bug Tracker" = "https://gitlab.aws.dev/langchain/aws-langchain/issues"
+
+[tool.setuptools]
+packages = ["aws_langchain"]
