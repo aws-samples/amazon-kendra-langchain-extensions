@@ -6,16 +6,18 @@ import kendra_chat_anthropic as anthropic
 import kendra_chat_flan_xl as flanxl
 import kendra_chat_flan_xxl as flanxxl
 import kendra_chat_open_ai as openai
+import kendra_chat_ai21 as ai21
 
 
 USER_ICON = "images/user-icon.png"
 AI_ICON = "images/ai-icon.png"
-MAX_HISTORY_LENGTH = 5
+MAX_HISTORY_LENGTH = 3
 PROVIDER_MAP = {
     'openai': 'Open AI',
     'anthropic': 'Anthropic',
     'flanxl': 'Flan XL',
-    'flanxxl': 'Flan XXL'
+    'flanxxl': 'Flan XXL',
+    'ai21': 'AI21',
 }
 
 # Check if the user ID is already stored in the session state
@@ -42,10 +44,13 @@ if 'llm_chain' not in st.session_state:
         elif (sys.argv[1] == 'openai'):
             st.session_state['llm_app'] = openai
             st.session_state['llm_chain'] = openai.build_chain()
+        elif (sys.argv[1] == 'ai21'):
+            st.session_state['llm_app'] = ai21
+            st.session_state['llm_chain'] = ai21.build_chain()
         else:
             raise Exception("Unsupported LLM: ", sys.argv[1])
     else:
-        raise Exception("Usage: streamlit run app.py <anthropic|flanxl|flanxxl|openai>")
+        raise Exception("Usage: streamlit run app.py <anthropic|flanxl|flanxxl|openai|ai21>")
 
 if 'chat_history' not in st.session_state:
     st.session_state['chat_history'] = []
@@ -103,7 +108,7 @@ def write_top_bar():
             provider = PROVIDER_MAP[selected_provider]
         else:
             provider = selected_provider.capitalize()
-        header = f"An AI App powered by Amazon Kendra and {provider}!"
+        header = f"An AI App powered by Amazon Kendra and Generative AI!"
         st.write(f"<h3 class='main-header'>{header}</h3>", unsafe_allow_html=True)
     with col3:
         clear = st.button("Clear Chat")

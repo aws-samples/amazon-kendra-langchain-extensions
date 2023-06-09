@@ -17,6 +17,10 @@ def get_top_n_results(resp, count):
         res_text = r["DocumentExcerpt"]["Text"]
     doc_excerpt = clean_result(res_text)
     combined_text = "Document Title: " + doc_title + "\nDocument Excerpt: \n" + doc_excerpt + "\n"
+
+    print("combined")
+    print(combined_text)
+
     return {"page_content":combined_text, "metadata":{"source":doc_uri, "title": doc_title, "excerpt": doc_excerpt, "type": r_type}}
 
 def kendra_query(kclient, kquery, kcount, kindex_id):

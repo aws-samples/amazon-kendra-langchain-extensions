@@ -1,9 +1,12 @@
-from aws_langchain.kendra_index_retriever import KendraIndexRetriever
+# from aws_langchain.kendra_index_retriever import KendraIndexRetriever
 from langchain.chains import ConversationalRetrievalChain
 from langchain import SagemakerEndpoint
 from langchain.llms.sagemaker_endpoint import ContentHandlerBase
 from langchain.prompts import PromptTemplate
 import sys
+sys.path.append('/Users/vincenoh/Desktop/GPT Task/amazon-kendra-langchain-extensions/aws_langchain')
+from kendra_index_retriever import KendraIndexRetriever
+
 import json
 import os
 
@@ -28,21 +31,32 @@ def build_chain():
   class ContentHandler(ContentHandlerBase):
       content_type = "application/json"
       accepts = "application/json"
+      prompt_length = 0
 
       def transform_input(self, prompt: str, model_kwargs: dict) -> bytes:
+
           input_str = json.dumps({"inputs": prompt, "parameters": model_kwargs})
           return input_str.encode('utf-8')
       
       def transform_output(self, output: bytes) -> str:
           response_json = json.loads(output.read().decode("utf-8"))
-          return response_json[0]["generated_text"]
+          # return response_json[0]["generated_text"]
+          prompt_length = response_json[0]["generated_text"].find("Solution:") + 9
+          return response_json[0]["generated_text"][prompt_length:]
 
   content_handler = ContentHandler()
 
   llm=SagemakerEndpoint(
           endpoint_name=endpoint_name, 
           region_name=region, 
-          model_kwargs={"temperature":1e-10, "max_length": 500},
+          model_kwargs={
+            "do_sample": True,
+            "top_p": 0.9,
+            "temperature": 0.8,
+            "max_new_tokens": 400,
+            "repetition_penalty": 1.03,
+            "stop": ["\nInstruction:","<|endoftext|>","</s>"]
+          },
           content_handler=content_handler
       )
       
@@ -56,7 +70,8 @@ def build_chain():
   If the AI does not know the answer to a question, it truthfully says it 
   does not know.
   {context}
-  Instruction: Based on the above documents, provide a detailed answer for, {question} Answer "don't know" if not present in the document. Solution:
+  Instruction: Based on the above documents, provide a detailed answer for, {question} Answer "don't know" if not present in the document.
+  Solution:
   """
   PROMPT = PromptTemplate(
       template=prompt_template, input_variables=["context", "question"]

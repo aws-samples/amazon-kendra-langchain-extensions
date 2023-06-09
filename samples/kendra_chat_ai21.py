@@ -5,64 +5,17 @@ from kendra_index_retriever import KendraIndexRetriever
 
 from langchain.chains import ConversationalRetrievalChain
 from langchain.prompts import PromptTemplate
-from langchain import SagemakerEndpoint
-from langchain.llms.sagemaker_endpoint import ContentHandlerBase
+from langchain.llms import AI21
 import sys
-import json
 import os
-
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
 
 MAX_HISTORY_LENGTH = 5
 
 def build_chain():
   region = os.environ["AWS_REGION"]
   kendra_index_id = os.environ["KENDRA_INDEX_ID"]
-  endpoint_name = os.environ["FLAN_XL_ENDPOINT"]
 
-  class ContentHandler(ContentHandlerBase):
-      content_type = "application/json"
-      accepts = "application/json"
-
-      def transform_input(self, prompt: str, model_kwargs: dict) -> bytes:
-          # input_str = json.dumps({"text_inputs": prompt, **model_kwargs})
-          # return input_str.encode('utf-8')
-          input_str = json.dumps({"inputs": prompt, "parameters": model_kwargs})
-          return input_str.encode('utf-8')
-      
-      def transform_output(self, output: bytes) -> str:
-          # response_json = json.loads(output.read().decode("utf-8"))
-          # return response_json["generated_texts"][0]
-          response_json = json.loads(output.read().decode("utf-8"))
-          prompt_length = response_json[0]["generated_text"].find("Solution:") + 9
-          return response_json[0]["generated_text"][prompt_length:]
-
-  content_handler = ContentHandler()
-
-  llm=SagemakerEndpoint(
-          endpoint_name=endpoint_name, 
-          region_name=region, 
-          # model_kwargs={"temperature":1e-10, "max_length": 500},
-            model_kwargs={
-            "do_sample": True,
-            "top_p": 0.9,
-            "temperature": 0.8,
-            "max_new_tokens": 400,
-            "repetition_penalty": 1.03,
-            "stop": ["\nInstruction:","<|endoftext|>","</s>"]
-          },
-          content_handler=content_handler
-      )
-
+  llm = AI21(ai21_api_key="EwzO4lugQNJYyUhcK8tXuKOPmhyPCe3h")#OpenAI(batch_size=5, temperature=0, max_tokens=300)
       
   retriever = KendraIndexRetriever(kendraindex=kendra_index_id, 
       awsregion=region, 
@@ -80,15 +33,29 @@ def build_chain():
       template=prompt_template, input_variables=["context", "question"]
   )
 
-  qa = ConversationalRetrievalChain.from_llm(llm=llm, retriever=retriever, qa_prompt=PROMPT, return_source_documents=True)
-  return qa
+  return ConversationalRetrievalChain.from_llm(llm=llm, retriever=retriever, qa_prompt=PROMPT, return_source_documents=True)
+  
 
 def run_chain(chain, prompt: str, history=[]):
-   return chain({"question": prompt, "chat_history": history})
+  print("prompt")
+  print(prompt)
+  return chain({"question": prompt, "chat_history": history})
+
 
 if __name__ == "__main__":
-  chat_history = []
+  class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
   qa = build_chain()
+  chat_history = []
   print(bcolors.OKBLUE + "Hello! How can I help you?" + bcolors.ENDC)
   print(bcolors.OKCYAN + "Ask a question, start a New search: or CTRL-D to exit." + bcolors.ENDC)
   print(">", end=" ", flush=True)
