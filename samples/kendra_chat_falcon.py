@@ -1,4 +1,6 @@
 from aws_langchain.kendra_index_retriever import KendraIndexRetriever
+from kendra_index_retriever import KendraIndexRetriever
+
 from langchain.chains import ConversationalRetrievalChain
 from langchain.prompts import PromptTemplate
 from langchain import SagemakerEndpoint
@@ -23,26 +25,39 @@ MAX_HISTORY_LENGTH = 5
 def build_chain():
   region = os.environ["AWS_REGION"]
   kendra_index_id = os.environ["KENDRA_INDEX_ID"]
-  endpoint_name = os.environ["FLAN_XL_ENDPOINT"]
+  endpoint_name = os.environ["FALCON_ENDPOINT"]
 
   class ContentHandler(ContentHandlerBase):
       content_type = "application/json"
       accepts = "application/json"
 
       def transform_input(self, prompt: str, model_kwargs: dict) -> bytes:
-          input_str = json.dumps({"text_inputs": prompt, **model_kwargs})
+          # input_str = json.dumps({"text_inputs": prompt, **model_kwargs})
+          # return input_str.encode('utf-8')
+          input_str = json.dumps({"inputs": prompt, "parameters": model_kwargs})
           return input_str.encode('utf-8')
       
       def transform_output(self, output: bytes) -> str:
+          # response_json = json.loads(output.read().decode("utf-8"))
+          # return response_json["generated_texts"][0]
           response_json = json.loads(output.read().decode("utf-8"))
-          return response_json["generated_texts"][0]
+          prompt_length = response_json[0]["generated_text"].find("Solution:") + 9
+          return response_json[0]["generated_text"][prompt_length:]
 
   content_handler = ContentHandler()
 
   llm=SagemakerEndpoint(
           endpoint_name=endpoint_name, 
           region_name=region, 
-          model_kwargs={"temperature":1e-10, "max_length": 500},
+          # model_kwargs={"temperature":1e-10, "max_length": 500},
+            model_kwargs={
+            "do_sample": True,
+            "top_p": 0.9,
+            "temperature": 0.8,
+            "max_new_tokens": 400,
+            "repetition_penalty": 1.03,
+            "stop": ["\nInstruction:","<|endoftext|>","</s>"]
+          },
           content_handler=content_handler
       )
 

@@ -1,6 +1,14 @@
 # AWS Langchain
 This repo provides a set of utility classes to work with [Langchain](https://github.com/hwchase17/langchain/tree/master). It currently has a retriever class `KendraIndexRetriever` for working with a Kendra index and sample scripts to execute the QA chain for SageMaker, Open AI and Anthropic providers.
 
+## Setup Sagemaker Dev Environment (If using Sagemaker as IDE)
+1. Go to Sagemaker Studio
+2. Create new studio and user profile
+3. Open Studio
+4. Go to IAM->Role
+5. Search for SageMakerExecutionRole
+6. Add AmazonKendraReadOnlyAccess to the role
+
 ## Installing
 
 Clone the repository
@@ -99,8 +107,10 @@ export AWS_REGION="<YOUR-AWS-REGION>"
 export KENDRA_INDEX_ID="<YOUR-KENDRA-INDEX-ID>"
 export FLAN_XL_ENDPOINT="<YOUR-SAGEMAKER-ENDPOINT-FOR-FLAN-T-XL>"
 export FLAN_XXL_ENDPOINT="<YOUR-SAGEMAKER-ENDPOINT-FOR-FLAN-T-XXL>"
+export FALCON_XL_ENDPOINT="<YOUR-SAGEMAKER-ENDPOINT-FOR-FALCON>"
 export OPENAI_API_KEY="<YOUR-OPEN-AI-API-KEY>"
 export ANTHROPIC_API_KEY="<YOUR-ANTHROPIC-API-KEY>"
+
 ```
 
 ### Running samples from the streamlit app
@@ -109,7 +119,7 @@ The samples directory is bundled with an `app.py` file that can be run as a web 
 cd samples
 streamlit run app.py anthropic
 ```
-The above command will run the `kendra_chat_anthropic` as the LLM chain. In order to run a different chain, pass a different provider, for example for running the `open_ai` chain run this command `streamlit run app.py openai`.
+The above command will run the `kendra_chat_anthropic` as the LLM chain. In order to run a different chain, pass a different provider, for example for running the `falcon` chain run this command `streamlit run app.py falcon`.
 
 ### Running samples from the command line
 ```bash

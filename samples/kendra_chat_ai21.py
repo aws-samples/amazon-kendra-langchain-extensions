@@ -1,8 +1,4 @@
-# from aws_langchain.kendra_index_retriever import KendraIndexRetriever
-import sys
-sys.path.append('/Users/vincenoh/Desktop/GPT Task/amazon-kendra-langchain-extensions/aws_langchain')
-from kendra_index_retriever import KendraIndexRetriever
-
+from aws_langchain.kendra_index_retriever import KendraIndexRetriever
 from langchain.chains import ConversationalRetrievalChain
 from langchain.prompts import PromptTemplate
 from langchain.llms import AI21

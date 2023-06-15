@@ -1,11 +1,8 @@
-# from aws_langchain.kendra_index_retriever import KendraIndexRetriever
+from aws_langchain.kendra_index_retriever import KendraIndexRetriever
 from langchain.chains import ConversationalRetrievalChain
 from langchain import SagemakerEndpoint
 from langchain.llms.sagemaker_endpoint import ContentHandlerBase
 from langchain.prompts import PromptTemplate
-import sys
-sys.path.append('/Users/vincenoh/Desktop/GPT Task/amazon-kendra-langchain-extensions/aws_langchain')
-from kendra_index_retriever import KendraIndexRetriever
 
 import json
 import os
