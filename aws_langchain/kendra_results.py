@@ -24,24 +24,8 @@ def get_top_n_results(resp, count):
     return {"page_content":combined_text, "metadata":{"source":doc_uri, "title": doc_title, "excerpt": doc_excerpt, "type": r_type}}
 
 def kendra_query(kclient, kquery, kcount, kindex_id):
-    # response = kclient.query(IndexId=kindex_id, QueryText=kquery.strip())
-    print("yo")
-    # response = kclient.query(IndexId=kindex_id, QueryText=kquery.strip(), AttributeFilter = {'AndAllFilters': 
-    #         [ 
-    #             {"EqualsTo": {"Key": "_data_source_id","Value": {"StringValue": "e81b3506-609c-4187-8cae-24deee6a0edd"}}},
-    #         ]
-    #         }
-    #     ])
+    response = kclient.query(IndexId=kindex_id, QueryText=kquery.strip())
 
-    response=kclient.query(
-        QueryText = kquery.strip(),
-        IndexId = kindex_id,
-        AttributeFilter = {'AndAllFilters': 
-            [ 
-                {"EqualsTo": {"Key": "_data_source_id","Value": {"StringValue": "e81b3506-609c-4187-8cae-24deee6a0edd"}}},
-            ]
-            }
-        )
     if len(response["ResultItems"]) > kcount:
         r_count = kcount
     else:

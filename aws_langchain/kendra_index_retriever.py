@@ -5,8 +5,7 @@ from typing import Any, Dict, List, Optional
 
 from langchain.schema import BaseRetriever, Document
 
-# from aws_langchain.kendra_results import kendra_query, kendra_client
-from kendra_results import kendra_query, kendra_client
+from aws_langchain.kendra_results import kendra_query, kendra_client
 import boto3
 
 class KendraIndexRetriever(BaseRetriever):
