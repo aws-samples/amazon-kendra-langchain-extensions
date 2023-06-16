@@ -1,9 +1,10 @@
 from aws_langchain.kendra_index_retriever import KendraIndexRetriever
+
 from langchain.chains import ConversationalRetrievalChain
+from langchain.prompts import PromptTemplate
 from langchain import SagemakerEndpoint
 from langchain.llms.sagemaker_endpoint import ContentHandlerBase
-from langchain.prompts import PromptTemplate
-
+import sys
 import json
 import os
 
@@ -23,21 +24,22 @@ MAX_HISTORY_LENGTH = 5
 def build_chain():
   region = os.environ["AWS_REGION"]
   kendra_index_id = os.environ["KENDRA_INDEX_ID"]
-  endpoint_name = os.environ["FLAN_XXL_ENDPOINT"]
+  endpoint_name = os.environ["FALCON_ENDPOINT"]
 
   class ContentHandler(ContentHandlerBase):
       content_type = "application/json"
       accepts = "application/json"
-      prompt_length = 0
 
       def transform_input(self, prompt: str, model_kwargs: dict) -> bytes:
-
+          # input_str = json.dumps({"text_inputs": prompt, **model_kwargs})
+          # return input_str.encode('utf-8')
           input_str = json.dumps({"inputs": prompt, "parameters": model_kwargs})
           return input_str.encode('utf-8')
       
       def transform_output(self, output: bytes) -> str:
+          # response_json = json.loads(output.read().decode("utf-8"))
+          # return response_json["generated_texts"][0]
           response_json = json.loads(output.read().decode("utf-8"))
-          # return response_json[0]["generated_text"]
           prompt_length = response_json[0]["generated_text"].find("Solution:") + 9
           return response_json[0]["generated_text"][prompt_length:]
 
@@ -46,7 +48,8 @@ def build_chain():
   llm=SagemakerEndpoint(
           endpoint_name=endpoint_name, 
           region_name=region, 
-          model_kwargs={
+          # model_kwargs={"temperature":1e-10, "max_length": 500},
+            model_kwargs={
             "do_sample": True,
             "top_p": 0.9,
             "temperature": 0.8,
@@ -56,6 +59,7 @@ def build_chain():
           },
           content_handler=content_handler
       )
+
       
   retriever = KendraIndexRetriever(kendraindex=kendra_index_id, 
       awsregion=region, 
@@ -67,8 +71,7 @@ def build_chain():
   If the AI does not know the answer to a question, it truthfully says it 
   does not know.
   {context}
-  Instruction: Based on the above documents, provide a detailed answer for, {question} Answer "don't know" if not present in the document.
-  Solution:
+  Instruction: Based on the above documents, provide a detailed answer for, {question} Answer "don't know" if not present in the document. Solution:
   """
   PROMPT = PromptTemplate(
       template=prompt_template, input_variables=["context", "question"]
@@ -78,8 +81,7 @@ def build_chain():
   return qa
 
 def run_chain(chain, prompt: str, history=[]):
-  return chain({"question": prompt, "chat_history": history})
-
+   return chain({"question": prompt, "chat_history": history})
 
 if __name__ == "__main__":
   chat_history = []

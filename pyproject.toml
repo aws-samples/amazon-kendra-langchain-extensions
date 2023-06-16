@@ -22,12 +22,14 @@ dependencies = [
 
 [project.optional-dependencies]
 samples = [
+    "ai21",
     "openai",
     "anthropic",
     "streamlit"
 ]
 
 dev = [
+    "ai21",
     "openai",
     "anthropic",
     "streamlit"

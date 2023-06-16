@@ -41,7 +41,22 @@ class KendraIndexRetriever(BaseRetriever):
 
         docs = get_relevant_documents('This is my query')
         """
+
+        print("This is my kendra query")
+        print(query)
+
+        prompt_length = query.find("Standalone question:")
+        if prompt_length > -1:
+            prompt_length = prompt_length + 20
+            query = query[prompt_length:]
+            print("This is my shortened kendra query")
+            print(query)
+
         docs = kendra_query(self.kclient, query, self.k, self.kendraindex)
+
+        print("docs")
+        print(docs)
+
         return docs
     
     async def aget_relevant_documents(self, query: str) -> List[Document]:
