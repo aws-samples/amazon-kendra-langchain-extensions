@@ -1,6 +1,8 @@
 import streamlit as st
 import uuid
 import sys
+# import globals
+# globals.initialize()
 
 import kendra_chat_anthropic as anthropic
 import kendra_chat_flan_xl as flanxl
@@ -97,6 +99,26 @@ st.markdown("""
         </style>
         """, unsafe_allow_html=True)
 
+
+# Add a selectbox to the sidebar:
+# add_selectbox = st.sidebar.selectbox(
+#     'How would you like to be contacted?',
+#     ('Email', 'Home phone', 'Mobile phone')
+# )
+
+# # Add a slider to the sidebar:
+# add_slider = st.sidebar.slider(
+#     'Kendra: Number of documents',
+#     1, 10, (3)
+# )
+
+
+# max_new_tokens = st.sidebar.slider(
+#     'LLM: Max number of tokens',
+#     100, 1000, (400)
+# )#400
+
+
 def write_logo():
     col1, col2, col3 = st.columns([5, 1, 5])
     with col2:
@@ -189,15 +211,26 @@ def render_sources(sources):
     with col2:
         with st.expander("Sources"):
             for s in sources:
-                st.write(s)
+                print(s.metadata)
+                title = s.metadata["title"]
+                title = s.metadata["source"]
+                excerpt = s.metadata["excerpt"]
+                st.write(title)
+                st.caption(excerpt)
 
     
 #Each answer will have context of the question asked in order to associate the provided feedback with the respective question
 def write_chat_message(md, q):
     chat = st.container()
     with chat:
-        render_answer(md['answer'])
-        render_sources(md['sources'])
+        if not md['sources']:
+            st.info('The documents do not contain any information about the question.')
+        else:
+            render_answer(md['answer'])
+        print("Rendering Sources..")
+        # text = md['answer']['source_documents'][0].metadata
+        # print(text)
+        render_sources(md['answer']['source_documents'])#render_sources(md['sources'])
     
         
 with st.container():
