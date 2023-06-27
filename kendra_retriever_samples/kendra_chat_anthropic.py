@@ -1,20 +1,20 @@
-from aws_langchain.kendra_index_retriever import KendraIndexRetriever
+from langchain.retrievers import AmazonKendraRetriever
 from langchain.chains import ConversationalRetrievalChain
 from langchain.prompts import PromptTemplate
-from langchain.llms import Anthropic
+from langchain.chat_models import ChatAnthropic as Anthropic
 import sys
 import os
 
 class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+  HEADER = '\033[95m'
+  OKBLUE = '\033[94m'
+  OKCYAN = '\033[96m'
+  OKGREEN = '\033[92m'
+  WARNING = '\033[93m'
+  FAIL = '\033[91m'
+  ENDC = '\033[0m'
+  BOLD = '\033[1m'
+  UNDERLINE = '\033[4m'
 
 MAX_HISTORY_LENGTH = 5
 
@@ -25,9 +25,7 @@ def build_chain():
 
   llm = Anthropic(temperature=0, anthropic_api_key=ANTHROPIC_API_KEY, max_tokens_to_sample = 512)
       
-  retriever = KendraIndexRetriever(kendraindex=kendra_index_id, 
-      awsregion=region, 
-      return_source_documents=True)
+  retriever = AmazonKendraRetriever(index_id=kendra_index_id)
 
   prompt_template = """
 
@@ -42,21 +40,35 @@ def build_chain():
   <documents>
   {context}
   </documents>
-  Based on the above documents, provide a detailed answer for, {question} Answer "don't know" if not present in the document. 
+  Based on the above documents, provide a detailed answer for, {question} Answer "don't know" 
+  if not present in the document. 
 
-Assistant:
-  """
+  Assistant:"""
+
   PROMPT = PromptTemplate(
       template=prompt_template, input_variables=["context", "question"]
   )
 
-  qa = ConversationalRetrievalChain.from_llm(llm=llm, retriever=retriever, qa_prompt=PROMPT, return_source_documents=True)
-  return qa
+  condense_qa_template = """
+  Given the following conversation and a follow up question, rephrase the follow up question 
+  to be a standalone question.
 
+  Chat History:
+  {chat_history}
+  Follow Up Input: {question}
+  Standalone question:"""
+  standalone_question_prompt = PromptTemplate.from_template(condense_qa_template)
+
+  qa = ConversationalRetrievalChain.from_llm(
+        llm=llm, 
+        retriever=retriever, 
+        condense_question_prompt=standalone_question_prompt, 
+        return_source_documents=True, 
+        combine_docs_chain_kwargs={"prompt":PROMPT})
+  return qa
 
 def run_chain(chain, prompt: str, history=[]):
   return chain({"question": prompt, "chat_history": history})
-
 
 if __name__ == "__main__":
   chat_history = []
