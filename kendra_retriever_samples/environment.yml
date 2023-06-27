@@ -1,0 +1,12 @@
+name: kendra-retriever-samples
+channels:
+  - https://conda.anaconda.org/conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+    - langchain>=0.0.213
+    - boto3>=1.26.159
+    - openai
+    - anthropic
+    - streamlit
