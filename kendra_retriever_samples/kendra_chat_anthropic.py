@@ -25,7 +25,7 @@ def build_chain():
 
   llm = Anthropic(temperature=0, anthropic_api_key=ANTHROPIC_API_KEY, max_tokens_to_sample = 512)
       
-  retriever = AmazonKendraRetriever(index_id=kendra_index_id)
+  retriever = AmazonKendraRetriever(index_id=kendra_index_id, region_name=region)
 
   prompt_template = """
 

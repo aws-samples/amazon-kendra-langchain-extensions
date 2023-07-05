@@ -33,8 +33,7 @@ def build_chain():
             model_kwargs={"temperature":1e-10, "max_length": 500},
             content_handler=content_handler
         )
-
-    retriever = AmazonKendraRetriever(index_id=kendra_index_id)
+    retriever = AmazonKendraRetriever(index_id=kendra_index_id, region_name=region)
 
     prompt_template = """
     The following is a friendly conversation between a human and an AI. 
