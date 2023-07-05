@@ -13,7 +13,7 @@ def build_chain():
 
   llm = OpenAI(batch_size=5, temperature=0, max_tokens=300)
       
-  retriever = AmazonKendraRetriever(index_id=kendra_index_id)
+  retriever = AmazonKendraRetriever(index_id=kendra_index_id, region_name=region)
 
   prompt_template = """
   The following is a friendly conversation between a human and an AI. 
