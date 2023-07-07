@@ -9,13 +9,18 @@ def clean_result(res_text):
     
 def get_top_n_results(resp, count):
     r = resp["ResultItems"][count]
-    doc_title = r["DocumentTitle"]["Text"]
+    doc_title = r["DocumentTitle"] #for Query API -> use: r["DocumentTitle"]["Text"]
     doc_uri = r["DocumentURI"]
-    r_type = r["Type"]
-    if (r["AdditionalAttributes"] and r["AdditionalAttributes"][0]["Key"] == "AnswerText"):
-        res_text = r["AdditionalAttributes"][0]["Value"]["TextWithHighlightsValue"]["Text"]
-    else:
-        res_text = r["DocumentExcerpt"]["Text"]
+    r_type = "Passage"  #for Query API -> use: r["Type"]
+
+    #for Query API
+    # if (r["AdditionalAttributes"] and r["AdditionalAttributes"][0]["Key"] == "AnswerText"):
+    #     res_text = r["AdditionalAttributes"][0]["Value"]["TextWithHighlightsValue"]["Text"]
+    # else:
+    #     res_text = r["DocumentExcerpt"]["Text"]
+
+    res_text = r["Content"]
+    
     doc_excerpt = clean_result(res_text)
     combined_text = "Document Title: " + doc_title + "\nDocument Excerpt: \n" + doc_excerpt + "\n"
 
@@ -41,9 +46,9 @@ def kendra_query(kclient, kquery, kcount, kindex_id):
     if "KENDRA_DATASOURCE" in os.environ:
         datasource = os.environ["KENDRA_DATASOURCE"]
         if datasource == "":
-            response = kclient.query(IndexId=kindex_id, QueryText=kquery.strip())
+            response = kclient.retrieve(IndexId=kindex_id, QueryText=kquery.strip())
         else:
-            response=kclient.query(
+            response=kclient.retrieve(
                 QueryText = kquery.strip(),
                 IndexId = kindex_id,
                 AttributeFilter = {'AndAllFilters': 
@@ -53,12 +58,13 @@ def kendra_query(kclient, kquery, kcount, kindex_id):
                 }
             )
     else:
-        response = kclient.query(IndexId=kindex_id, QueryText=kquery.strip())
+        response = kclient.retrieve(IndexId=kindex_id, QueryText=kquery.strip())
         
     if len(response["ResultItems"]) > kcount:
         r_count = kcount
     else:
         r_count = len(response["ResultItems"])
+        
     docs = [get_top_n_results(response, i) for i in range(0, r_count)]
     return [Document(page_content = d["page_content"], metadata = d["metadata"]) for d in docs]
 

@@ -105,21 +105,17 @@ You can use commands as below to set the environment variables.
 ```bash
 export AWS_REGION="<YOUR-AWS-REGION>"
 export KENDRA_INDEX_ID="<YOUR-KENDRA-INDEX-ID>"
-export FLAN_XL_ENDPOINT="<YOUR-SAGEMAKER-ENDPOINT-FOR-FLAN-T-XL>"
-export FLAN_XXL_ENDPOINT="<YOUR-SAGEMAKER-ENDPOINT-FOR-FLAN-T-XXL>"
 export FALCON_ENDPOINT="<YOUR-SAGEMAKER-ENDPOINT-FOR-FALCON>"
-export OPENAI_API_KEY="<YOUR-OPEN-AI-API-KEY>"
 export ANTHROPIC_API_KEY="<YOUR-ANTHROPIC-API-KEY>"
-
 ```
 
 ### Running samples from the streamlit app
 The samples directory is bundled with an `app.py` file that can be run as a web app using streamlit. 
 ```bash
 cd samples
-streamlit run app.py anthropic
+streamlit run app.py falcon
 ```
-The above command will run the `kendra_chat_anthropic` as the LLM chain. In order to run a different chain, pass a different provider, for example for running the `falcon` chain run this command `streamlit run app.py falcon`.
+The above command will run the `kendra_chat_falcon` as the LLM chain. In order to run a different chain, pass a different provider, for example for running the `anthropic` chain run this command `streamlit run app.py anthropic`.
 
 ### Running samples from the command line
 ```bash

@@ -54,8 +54,8 @@ class KendraIndexRetriever(BaseRetriever):
 
         docs = kendra_query(self.kclient, query, self.k, self.kendraindex)
 
-        print("docs")
-        print(docs)
+        # print("docs")
+        # print(docs)
 
         return docs
     

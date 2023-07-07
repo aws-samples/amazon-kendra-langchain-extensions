@@ -7,6 +7,7 @@ from langchain.llms.sagemaker_endpoint import ContentHandlerBase
 import sys
 import json
 import os
+import globals
 
 class bcolors:
     HEADER = '\033[95m'
@@ -34,6 +35,8 @@ def build_chain():
           # input_str = json.dumps({"text_inputs": prompt, **model_kwargs})
           # return input_str.encode('utf-8')
           input_str = json.dumps({"inputs": prompt, "parameters": model_kwargs})
+          print("input")
+          print(input_str)
           return input_str.encode('utf-8')
       
       def transform_output(self, output: bytes) -> str:
@@ -41,6 +44,8 @@ def build_chain():
           # return response_json["generated_texts"][0]
           response_json = json.loads(output.read().decode("utf-8"))
           prompt_length = response_json[0]["generated_text"].find("Solution:") + 9
+          print("output")
+          print(response_json[0]["generated_text"][prompt_length:])
           return response_json[0]["generated_text"][prompt_length:]
 
   content_handler = ContentHandler()
@@ -52,7 +57,7 @@ def build_chain():
             model_kwargs={
             "do_sample": True,
             "top_p": 0.9,
-            "temperature": 0.8,
+            "temperature": 0.01,
             "max_new_tokens": 400,
             "repetition_penalty": 1.03,
             "stop": ["\nInstruction:","<|endoftext|>","</s>"]
@@ -62,7 +67,7 @@ def build_chain():
 
       
   retriever = KendraIndexRetriever(kendraindex=kendra_index_id, 
-      awsregion=region, 
+      awsregion=region, k=5,
       return_source_documents=True)
 
   prompt_template = """
