@@ -4,7 +4,7 @@
 ##and index the crawled documents.
 ##The output of the CloudFormation template shows the Kendra index id and the AWS region it was created in.
 ##It takes about 30 minutes to create an Amazon Kendra index and about 15 minutes more to crawl and index
-##the content of these webpages to the index. Hence you might need to wait for about 45 minutes after
+##the content of these webpages to the index. Hence, you might need to wait for about 45 minutes after
 ##launching the CloudFormation stack
 Resources:
   ##Create the Role needed to create a Kendra Index
@@ -34,37 +34,23 @@ Resources:
                 Resource: '*'
                 Action: 'logs:DescribeLogGroups'
               - Effect: Allow
-                Resource: !Sub
-                  - 'arn:aws:logs:${region}:${account}:log-group:/aws/kendra/*'
-                  - region: !Ref 'AWS::Region'
-                    account: !Ref 'AWS::AccountId'
-                Action: 'logs:CreateLogGroup'
+                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/kendra/*'
+                Action:
+                  - 'logs:CreateLogGroup'
               - Effect: Allow
-                Resource: !Sub
-                  - 'arn:aws:logs:${region}:${account}:log-group:/aws/kendra/*:log-stream:*'
-                  - region: !Ref 'AWS::Region'
-                    account: !Ref 'AWS::AccountId'
-                Action: 
+                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/kendra/*:log-stream:*'
+                Action:
                   - 'logs:DescribeLogStreams'
                   - 'logs:CreateLogStream'
                   - 'logs:PutLogEvents'
-          PolicyName: !Join
-            - ''
-            - - !Ref 'AWS::StackName'
-              - '-DocsKendraIndexPolicy'
-      RoleName: !Join
-        - ''
-        - - !Ref 'AWS::StackName'
-          - '-DocsKendraIndexRole'
-      
+          PolicyName: !Sub '${AWS::StackName}-DocsKendraIndexPolicy'
+      RoleName: !Sub '${AWS::StackName}-DocsKendraIndexRole'
+
   ##Create the Kendra Index
   DocsKendraIndex:
     Type: 'AWS::Kendra::Index'
     Properties:
-      Name: !Join
-        - ''
-        - - !Ref 'AWS::StackName'
-          - '-Index'
+      Name: !Sub '${AWS::StackName}-Index'
       Edition: 'DEVELOPER_EDITION'
       RoleArn: !GetAtt KendraIndexRole.Arn
 
@@ -85,28 +71,18 @@ Resources:
             Version: 2012-10-17
             Statement:
               - Effect: Allow
-                Resource: !Sub
-                  - 'arn:aws:kendra:${region}:${account}:index/${index}'
-                  - region: !Ref 'AWS::Region'
-                    account: !Ref 'AWS::AccountId'
-                    index: !GetAtt DocsKendraIndex.Id
+                Resource: !Sub 'arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/${DocsKendraIndex.Id}'
                 Action:
                   - 'kendra:BatchPutDocument'
                   - 'kendra:BatchDeleteDocument'
-          PolicyName: !Join
-            - ''
-            - - !Ref 'AWS::StackName'
-              - '-DocsDSPolicy'
-      RoleName: !Join
-        - ''
-        - - !Ref 'AWS::StackName'
-          - '-DocsDSRole'
-  
+          PolicyName: !Sub '${AWS::StackName}-DocsDSPolicy'
+      RoleName: !Sub '${AWS::StackName}-DocsDSRole'
+
   #Docs Data Source
   KendraDocsDS:
     Type: 'AWS::Kendra::DataSource'
-    Properties: 
-      DataSourceConfiguration: 
+    Properties:
+      DataSourceConfiguration:
         WebCrawlerConfiguration:
           UrlInclusionPatterns:
             - '.*https://docs.aws.amazon.com/lex/.*'
@@ -122,9 +98,10 @@ Resources:
       Name: 'KendraDocsDS'
       RoleArn: !GetAtt KendraDSRole.Arn
       Type: 'WEBCRAWLER'
-    
+
+
   DataSourceSyncLambdaRole:
-    Type: AWS::IAM::Role
+    Type: 'AWS::IAM::Role'
     Properties:
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -140,26 +117,21 @@ Resources:
             Version: 2012-10-17
             Statement:
               - Effect: Allow
-                Resource: !Sub
-                  - 'arn:aws:kendra:${region}:${account}:index/${index}*'
-                  - region: !Ref 'AWS::Region'
-                    account: !Ref 'AWS::AccountId'
-                    index: !GetAtt DocsKendraIndex.Id
+                Resource: !Sub 'arn:aws:kendra:${AWS::Region}:${AWS::AccountId}:index/${DocsKendraIndex.Id}*'
                 Action:
                   - 'kendra:*'
           PolicyName: DataSourceSyncLambdaPolicy
-          
+
   DataSourceSyncLambda:
-    Type: AWS::Lambda::Function
+    Type: 'AWS::Lambda::Function'
     Properties:
       Handler: index.lambda_handler
       Runtime: python3.8
-      Role: !GetAtt 'DataSourceSyncLambdaRole.Arn'
+      Role: !GetAtt DataSourceSyncLambdaRole.Arn
       Timeout: 900
       MemorySize: 1024
       Code:
         ZipFile: |
-
           # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
           # SPDX-License-Identifier: MIT-0
           
@@ -167,7 +139,6 @@ Resources:
           import logging
           import boto3
           import cfnresponse
-          import random
           import os
           
           logger = logging.getLogger()
@@ -194,9 +165,9 @@ Resources:
         Variables:
           INDEX_ID: !GetAtt DocsKendraIndex.Id
           DS_ID: !GetAtt KendraDocsDS.Id
-  
+
   DataSourceSync:
-    Type: Custom::DataSourceSync
+    Type: 'Custom::DataSourceSync'
     DependsOn: 
       - DocsKendraIndex
       - KendraDocsDS
