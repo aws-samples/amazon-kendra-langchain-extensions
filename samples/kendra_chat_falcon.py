@@ -7,7 +7,6 @@ from langchain.llms.sagemaker_endpoint import ContentHandlerBase
 import sys
 import json
 import os
-import globals
 
 class bcolors:
     HEADER = '\033[95m'
@@ -67,7 +66,7 @@ def build_chain():
 
       
   retriever = KendraIndexRetriever(kendraindex=kendra_index_id, 
-      awsregion=region, k=5,
+      awsregion=region, k=3,
       return_source_documents=True)
 
   prompt_template = """
