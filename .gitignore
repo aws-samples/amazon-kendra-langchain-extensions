@@ -83,3 +83,6 @@ dmypy.json
 
 # vs code
 .vscode
+
+# venv files
+env*
