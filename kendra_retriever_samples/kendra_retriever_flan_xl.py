@@ -1,20 +1,40 @@
-from aws_langchain.kendra_index_retriever import KendraIndexRetriever
+from langchain.retrievers import AmazonKendraRetriever
 from langchain.chains import RetrievalQA
+from langchain import OpenAI
 from langchain.prompts import PromptTemplate
-from langchain.llms import Anthropic
+from langchain import SagemakerEndpoint
+from langchain.llms.sagemaker_endpoint import LLMContentHandler
+import json
 import os
 
 
 def build_chain():
-    ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
     region = os.environ["AWS_REGION"]
     kendra_index_id = os.environ["KENDRA_INDEX_ID"]
+    endpoint_name = os.environ["FLAN_XL_ENDPOINT"]
 
-    llm = Anthropic(temperature=0, anthropic_api_key=ANTHROPIC_API_KEY)
+    class ContentHandler(LLMContentHandler):
+        content_type = "application/json"
+        accepts = "application/json"
+
+        def transform_input(self, prompt: str, model_kwargs: dict) -> bytes:
+            input_str = json.dumps({"text_inputs": prompt, **model_kwargs})
+            return input_str.encode('utf-8')
         
-    retriever = KendraIndexRetriever(kendraindex=kendra_index_id, 
-        awsregion=region, 
-        return_source_documents=True)
+        def transform_output(self, output: bytes) -> str:
+            response_json = json.loads(output.read().decode("utf-8"))
+            return response_json["generated_texts"][0]
+
+    content_handler = ContentHandler()
+
+    llm=SagemakerEndpoint(
+            endpoint_name=endpoint_name, 
+            region_name=region, 
+            model_kwargs={"temperature":1e-10, "max_length": 500},
+            content_handler=content_handler
+        )
+
+    retriever = AmazonKendraRetriever(index_id=kendra_index_id)
 
     prompt_template = """
     The following is a friendly conversation between a human and an AI. 
@@ -22,19 +42,21 @@ def build_chain():
     If the AI does not know the answer to a question, it truthfully says it 
     does not know.
     {context}
-    Question: Based on the above documents, provide a detailed answer for, {question} Answer "don't know" if not present in the document. Answer:
-    """
+    Instruction: Based on the above documents, provide a detailed answer for, {question} Answer "don't know" 
+    if not present in the document. 
+    Solution:"""
     PROMPT = PromptTemplate(
         template=prompt_template, input_variables=["context", "question"]
     )
     chain_type_kwargs = {"prompt": PROMPT}
-    return RetrievalQA.from_chain_type(
+    qa = RetrievalQA.from_chain_type(
         llm, 
         chain_type="stuff", 
         retriever=retriever, 
         chain_type_kwargs=chain_type_kwargs,
         return_source_documents=True
     )
+    return qa
 
 def run_chain(chain, prompt: str, history=[]):
     result = chain(prompt)
