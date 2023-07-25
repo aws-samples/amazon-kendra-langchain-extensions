@@ -2,7 +2,7 @@
 from aws_langchain.kendra import AmazonKendraRetriever
 from langchain.chains import ConversationalRetrievalChain
 from langchain.prompts import PromptTemplate
-from langchain.llms import Anthropic
+from langchain.llms.bedrock import Bedrock
 import sys
 import os
 
@@ -20,11 +20,16 @@ class bcolors:
 MAX_HISTORY_LENGTH = 5
 
 def build_chain():
-  ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
+  bedrock_endpoint_url = "https://prod.us-west-2.frontend.bedrock.aws.dev"#os.environ["BEDROCK_ENDPOINT_URL"]
   region = os.environ["AWS_REGION"]
   kendra_index_id = os.environ["KENDRA_INDEX_ID"]
 
-  llm = Anthropic(temperature=0, anthropic_api_key=ANTHROPIC_API_KEY, max_tokens_to_sample = 512, model="claude-2")
+  llm = Bedrock(
+      # credentials_profile_name="default",
+      region_name = "us-west-2",
+      model_id="amazon.titan-tg1-large",
+      endpoint_url=bedrock_endpoint_url,
+  )
       
   retriever = AmazonKendraRetriever(index_id=kendra_index_id,top_k=5)
 

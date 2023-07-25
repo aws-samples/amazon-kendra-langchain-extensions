@@ -10,10 +10,11 @@ import kendra_chat_flan_xxl as flanxxl
 import kendra_chat_open_ai as openai
 import kendra_chat_ai21 as ai21
 import kendra_chat_falcon as falcon
+import kendra_chat_bedrock as bedrock
 
 
 USER_ICON = "images/user-icon.png"
-AI_ICON = "images/ai-icon.png"
+AI_ICON = "images/logo.png"#"images/ai-icon.png"
 MAX_HISTORY_LENGTH = 3
 PROVIDER_MAP = {
     'openai': 'Open AI',
@@ -22,6 +23,7 @@ PROVIDER_MAP = {
     'flanxxl': 'Flan XXL',
     'ai21': 'AI21',
     'falcon': 'Falcon',
+    'bedrock': 'Bedrock',
 }
 
 # Check if the user ID is already stored in the session state
@@ -54,10 +56,13 @@ if 'llm_chain' not in st.session_state:
         elif (sys.argv[1] == 'ai21'):
             st.session_state['llm_app'] = ai21
             st.session_state['llm_chain'] = ai21.build_chain()
+        elif (sys.argv[1] == 'bedrock'):
+            st.session_state['llm_app'] = bedrock
+            st.session_state['llm_chain'] = bedrock.build_chain()
         else:
             raise Exception("Unsupported LLM: ", sys.argv[1])
     else:
-        raise Exception("Usage: streamlit run app.py <anthropic|flanxl|flanxxl|openai|ai21|falcon>")
+        raise Exception("Usage: streamlit run app.py <anthropic|flanxl|flanxxl|openai|ai21|bedrock|falcon>")
 
 if 'chat_history' not in st.session_state:
     st.session_state['chat_history'] = []
@@ -126,7 +131,7 @@ def write_logo():
 
 
 def write_top_bar():
-    col1, col2, col3 = st.columns([1,10,2])
+    col1, col2, col3 = st.columns([1,5,2])
     with col1:
         st.image(AI_ICON, use_column_width='always')
     with col2:
@@ -222,6 +227,9 @@ def render_sources(sources):
 #Each answer will have context of the question asked in order to associate the provided feedback with the respective question
 def write_chat_message(md, q):
     chat = st.container()
+
+    print(md)
+
     with chat:
         if not md['sources']:
             st.info('The documents do not contain any information about the question.')

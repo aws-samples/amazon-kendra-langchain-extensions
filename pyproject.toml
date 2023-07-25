@@ -15,7 +15,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "langchain==0.0.137",
+    "langchain==0.0.242",
     "boto3",
     "html2text"
 ]
