@@ -107,6 +107,7 @@ export AWS_REGION="<YOUR-AWS-REGION>"
 export KENDRA_INDEX_ID="<YOUR-KENDRA-INDEX-ID>"
 export FALCON_ENDPOINT="<YOUR-SAGEMAKER-ENDPOINT-FOR-FALCON>"
 export ANTHROPIC_API_KEY="<YOUR-ANTHROPIC-API-KEY>"
+export BEDROCK_ENDPOINT_URL="<YOUR-BEDROCK-ENDPOINT-URL>"
 ```
 
 ### Running samples from the streamlit app
@@ -116,6 +117,22 @@ cd samples
 streamlit run app.py falcon
 ```
 The above command will run the `kendra_chat_falcon` as the LLM chain. In order to run a different chain, pass a different provider, for example for running the `anthropic` chain run this command `streamlit run app.py anthropic`.
+
+### If using Bedrock as LLM model
+
+Update boto3 SDK with preview bedrock preview features by downloading the following scripts in this folder
+
+```sh
+bash download-dependencies.sh
+```
+
+To install it, run the following commands:
+
+```python
+pip install dependencies/botocore-1.29.162-py3-none-any.whl 
+pip install dependencies/boto3-1.26.162-py3-none-any.whl 
+pip install dependencies/awscli-1.27.162-py3-none-any.whl 
+```
 
 ### Running samples from the command line
 ```bash

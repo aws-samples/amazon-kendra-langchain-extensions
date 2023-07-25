@@ -6,6 +6,10 @@ from langchain.llms.bedrock import Bedrock
 import sys
 import os
 
+# module_path = ".."
+# sys.path.append(os.path.abspath(module_path))
+# from utils import bedrock, print_ww
+
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -20,12 +24,15 @@ class bcolors:
 MAX_HISTORY_LENGTH = 5
 
 def build_chain():
-  bedrock_endpoint_url = "https://prod.us-west-2.frontend.bedrock.aws.dev"#os.environ["BEDROCK_ENDPOINT_URL"]
+  bedrock_endpoint_url = os.environ["BEDROCK_ENDPOINT_URL"] #https://prod.us-west-2.frontend.bedrock.aws.dev
   region = os.environ["AWS_REGION"]
   kendra_index_id = os.environ["KENDRA_INDEX_ID"]
+  # boto3_bedrock = bedrock.get_bedrock_client(os.environ.get('bedrock-role', None))
+  # os.environ['AWS_PROFILE'] = 'default'
 
   llm = Bedrock(
-      # credentials_profile_name="default",
+      credentials_profile_name="default",
+      # client=boto3_bedrock,
       region_name = "us-west-2",
       model_id="amazon.titan-tg1-large",
       endpoint_url=bedrock_endpoint_url,
