@@ -2,7 +2,8 @@
 from aws_langchain.kendra import AmazonKendraRetriever
 from langchain.chains import ConversationalRetrievalChain
 from langchain.prompts import PromptTemplate
-from langchain.llms import Anthropic
+# from langchain.llms import Anthropic
+from langchain.chat_models import ChatAnthropic
 import sys
 import os
 
@@ -24,7 +25,8 @@ def build_chain():
   region = os.environ["AWS_REGION"]
   kendra_index_id = os.environ["KENDRA_INDEX_ID"]
 
-  llm = Anthropic(temperature=0, anthropic_api_key=ANTHROPIC_API_KEY, max_tokens_to_sample = 512, model="claude-2")
+  llm = ChatAnthropic(temperature=0, anthropic_api_key=ANTHROPIC_API_KEY, max_tokens_to_sample = 512, model="claude-2")
+  
       
   retriever = AmazonKendraRetriever(index_id=kendra_index_id,top_k=5)
 
