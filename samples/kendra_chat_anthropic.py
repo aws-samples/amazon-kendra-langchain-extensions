@@ -1,8 +1,7 @@
-# from aws_langchain.kendra_index_retriever import KendraIndexRetriever
-from aws_langchain.kendra import AmazonKendraRetriever
+# from aws_langchain.kendra import AmazonKendraRetriever #custom library
+from langchain.retrievers import AmazonKendraRetriever
 from langchain.chains import ConversationalRetrievalChain
 from langchain.prompts import PromptTemplate
-# from langchain.llms import Anthropic
 from langchain.chat_models import ChatAnthropic
 import sys
 import os

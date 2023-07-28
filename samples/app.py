@@ -12,7 +12,6 @@ import kendra_chat_ai21 as ai21
 import kendra_chat_falcon as falcon
 import kendra_chat_bedrock as bedrock
 
-
 USER_ICON = "images/user-icon.png"
 AI_ICON = "images/logo.png"#"images/ai-icon.png"
 MAX_HISTORY_LENGTH = 3
@@ -142,6 +141,12 @@ def write_top_bar():
             provider = selected_provider.capitalize()
         header = f"An AI App powered by Amazon Kendra and Generative AI!"
         st.write(f"<h3 class='main-header'>{header}</h3>", unsafe_allow_html=True)
+        # Displaying PDF File
+        # pdf_display = F'<iframe srcdoc="<html><body><object type="application/pdf" data="https://d2qrbbbqnxtln.cloudfront.net/bedrock-sample.pdf" width="995" height="841" ></object>Hello, <b>world</b>.</body></html>" width="700" height="1000" type="application/pdf"></iframe>'
+        # pdf_display = F'<iframe src="https://d2qrbbbqnxtln.cloudfront.net/bedrock-sample2.pdf#page9" width="700" height="1000" type="application/pdf"></iframe>'
+        # pdf_display = F'<iframe><embed src="http://example.com/the.pdf" width="500" height="375" type="application/pdf"></iframe>'
+        # st.markdown(pdf_display, unsafe_allow_html=True)
+        # st.write(F'<embed src="https://d2qrbbbqnxtln.cloudfront.net/bedrock-sample2.pdf#page=9" width="500" height="375" type="application/pdf">', unsafe_allow_html=True)
     with col3:
         clear = st.button("Clear Chat")
     return clear
@@ -211,18 +216,24 @@ def render_answer(answer):
     with col2:
         st.info(answer['answer'])
 
+previewCount = 0
 def render_sources(sources):
+    global previewCount
     col1, col2 = st.columns([1,12])
     with col2:
         with st.expander("Sources"):
             for s in sources:
                 print(s.metadata)
                 title = s.metadata["title"]
-                title = s.metadata["source"]
+                source = s.metadata["source"]
                 excerpt = s.metadata["excerpt"]
-                st.write(title)
+                st.write(source)
                 st.caption(excerpt)
-
+                previewCount+=1
+                checkboxId="Show Preview-"+str(previewCount)
+                if st.checkbox(label="Show Preview",key=checkboxId):
+                    st.write(F'<embed src="{source}" width="500" height="375" type="application/pdf">', unsafe_allow_html=True)
+                    
     
 #Each answer will have context of the question asked in order to associate the provided feedback with the respective question
 def write_chat_message(md, q):

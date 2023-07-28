@@ -1,4 +1,5 @@
 import re
+import os
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Literal, Optional, Union
 
@@ -365,30 +366,47 @@ class AmazonKendraRetriever(BaseRetriever):
         top_k: int,
         attribute_filter: Optional[Dict] = None,
     ) -> List[Document]:
-        if attribute_filter is not None:
+
+        print("My Kendra Query:")
+        print(query.strip())
+
+        # if attribute_filter is not None:
+        if "KENDRA_DATASOURCE" in os.environ:
             datasource = os.environ["KENDRA_DATASOURCE"]
-            if "KENDRA_DATASOURCE" in os.environ:
-                if datasource == "":
-                    response = self.client.retrieve(
-                        IndexId=self.index_id, QueryText=query.strip(), PageSize=top_k
-                    )
-                else:
-                    response=self.client.retrieve(
-                        IndexId=self.index_id,
-                        QueryText=query.strip(),
-                        PageSize=top_k,
-                        AttributeFilter = {'AndAllFilters': 
-                            [ 
-                                {"EqualsTo": {"Key": "_data_source_id","Value": {"StringValue": datasource}}},
-                            ]
-                        }
-                    )
-                # response = self.client.retrieve(
+            if datasource == "":
+                print("query all data sources:")
+                response = self.client.retrieve(
+                    IndexId=self.index_id, QueryText=query.strip(), PageSize=top_k
+                )
+            else:
+                print("limiting data sources:")
+                print(datasource)
+                response=self.client.retrieve(
+                    IndexId=self.index_id,
+                    QueryText=query.strip(),
+                    PageSize=top_k,
+                    AttributeFilter = {'AndAllFilters': 
+                        [ 
+                            {"EqualsTo": {"Key": "_data_source_id","Value": {"StringValue": datasource}}},
+                            # {"ContainsAny": {"Key": "_data_source_id","Value": {"StringListValue": [ "ID1", "ID2"]}}},
+                        ]
+                    }
+                )
+                # response = self.client.query(
                 #     IndexId=self.index_id,
                 #     QueryText=query.strip(),
-                #     PageSize=top_k,
-                #     AttributeFilter=attribute_filter,
+                #     AttributeFilter = {'AndAllFilters': 
+                #         [ 
+                #             {"EqualsTo": {"Key": "_data_source_id","Value": {"StringValue": "61638d78-eeae-47df-b35c-add228bd0f04"}}},
+                #         ]
+                #     }
                 # )
+            # response = self.client.retrieve(
+            #     IndexId=self.index_id,
+            #     QueryText=query.strip(),
+            #     PageSize=top_k,
+            #     AttributeFilter=attribute_filter,
+            # )
         else:
             response = self.client.retrieve(
                 IndexId=self.index_id, QueryText=query.strip(), PageSize=top_k
@@ -397,21 +415,23 @@ class AmazonKendraRetriever(BaseRetriever):
         result_len = len(r_result.ResultItems)
 
         if result_len == 0:
+            print("No results")
             # retrieve API returned 0 results, call query API
-            if attribute_filter is not None:
-                response = self.client.query(
-                    IndexId=self.index_id,
-                    QueryText=query.strip(),
-                    PageSize=top_k,
-                    AttributeFilter=attribute_filter,
-                )
-            else:
-                response = self.client.query(
-                    IndexId=self.index_id, QueryText=query.strip(), PageSize=top_k
-                )
-            q_result = QueryResult.parse_obj(response)
-            docs = q_result.get_top_k_docs(top_k)
+            # if attribute_filter is not None:
+            #     response = self.client.query(
+            #         IndexId=self.index_id,
+            #         QueryText=query.strip(),
+            #         PageSize=top_k,
+            #         AttributeFilter=attribute_filter,
+            #     )
+            # else:
+            #     response = self.client.query(
+            #         IndexId=self.index_id, QueryText=query.strip(), PageSize=top_k
+            #     )
+            # q_result = QueryResult.parse_obj(response)
+            docs = []
         else:
+            print("returning results")
             docs = r_result.get_top_k_docs(top_k)
         return docs
 

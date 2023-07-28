@@ -1,5 +1,5 @@
-# from aws_langchain.kendra_index_retriever import KendraIndexRetriever
-from aws_langchain.kendra import AmazonKendraRetriever
+# from aws_langchain.kendra import AmazonKendraRetriever #custom library
+from langchain.retrievers import AmazonKendraRetriever
 from langchain.chains import ConversationalRetrievalChain
 from langchain.prompts import PromptTemplate
 from langchain import SagemakerEndpoint
@@ -49,6 +49,13 @@ def build_chain():
 
   content_handler = ContentHandler()
 
+  # llm=SagemakerEndpoint(
+  #         endpoint_name=endpoint_name, 
+  #         region_name=region, 
+  #         model_kwargs={"temperature":1e-10, "max_length": 500},
+  #         content_handler=content_handler
+  #     )
+
   llm=SagemakerEndpoint(
           endpoint_name=endpoint_name, 
           region_name=region, 
@@ -63,8 +70,8 @@ def build_chain():
           },
           content_handler=content_handler
       )
-
-  retriever = AmazonKendraRetriever(index_id=kendra_index_id,top_k=3)
+      
+  retriever = AmazonKendraRetriever(index_id=kendra_index_id)
 
   prompt_template = """
   The following is a friendly conversation between a human and an AI. 
@@ -72,8 +79,9 @@ def build_chain():
   If the AI does not know the answer to a question, it truthfully says it 
   does not know.
   {context}
-  Instruction: Based on the above documents, provide a detailed answer for, {question} Answer "don't know" if not present in the document. Solution:
-  """
+  Instruction: Based on the above documents, provide a detailed answer for, {question} Answer "don't know" 
+  if not present in the document. 
+  Solution:"""
   PROMPT = PromptTemplate(
       template=prompt_template, input_variables=["context", "question"]
   )
