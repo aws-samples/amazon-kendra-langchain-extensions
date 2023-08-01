@@ -65,7 +65,7 @@ Resources:
         - ''
         - - !Ref 'AWS::StackName'
           - '-Index'
-      Edition: 'DEVELOPER_EDITION'
+      Edition: !Ref KendraEdition
       RoleArn: !GetAtt KendraIndexRole.Arn
 
   ##Create the Role needed to attach the Webcrawler Data Source
@@ -203,6 +203,15 @@ Resources:
     Properties:
       ServiceToken: !GetAtt DataSourceSyncLambda.Arn
     
+Parameters:
+  KendraEdition:
+    Type: String
+    Default: 'ENTERPRISE_EDITION'
+    AllowedValues:
+      - 'ENTERPRISE_EDITION'
+      - 'DEVELOPER_EDITION'
+    Description: 'ENTERPRISE_EDITION (default) is recommended for production deployments, and offers high availability and scale up capabilities. DEVELOPER_EDITION (Free Tier eligible) is suitable for temporary, non-production, experimental workloads. NOTE: indexes cannot currently be migrated from one type to another.'
+
 Outputs:
   KendraIndexID:
     Value: !GetAtt DocsKendraIndex.Id
