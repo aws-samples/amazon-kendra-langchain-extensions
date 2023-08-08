@@ -1,3 +1,5 @@
 langchain==0.0.242
 boto3
 html2text
+streamlit
+anthropic
