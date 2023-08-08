@@ -1,4 +1,5 @@
-from aws_langchain.kendra_index_retriever import KendraIndexRetriever
+# from aws_langchain.kendra import AmazonKendraRetriever #custom library
+from langchain.retrievers import AmazonKendraRetriever
 from langchain.chains import ConversationalRetrievalChain
 from langchain import SagemakerEndpoint
 from langchain.llms.sagemaker_endpoint import ContentHandlerBase
@@ -57,9 +58,7 @@ def build_chain():
           content_handler=content_handler
       )
       
-  retriever = KendraIndexRetriever(kendraindex=kendra_index_id, 
-      awsregion=region, 
-      return_source_documents=True)
+  retriever = AmazonKendraRetriever(index_id=kendra_index_id,region_name=region)
 
   prompt_template = """
   The following is a friendly conversation between a human and an AI. 

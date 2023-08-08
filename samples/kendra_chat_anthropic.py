@@ -27,7 +27,7 @@ def build_chain():
   llm = ChatAnthropic(temperature=0, anthropic_api_key=ANTHROPIC_API_KEY, max_tokens_to_sample = 512, model="claude-2")
   
       
-  retriever = AmazonKendraRetriever(index_id=kendra_index_id,top_k=5)
+  retriever = AmazonKendraRetriever(index_id=kendra_index_id,top_k=5,region_name=region)
 
   #OLD library syntax
   # retriever = AmazonKendraRetriever(index_id=kendra_index_id, 

@@ -1,4 +1,5 @@
-from aws_langchain.kendra_index_retriever import KendraIndexRetriever
+# from aws_langchain.kendra import AmazonKendraRetriever #custom library
+from langchain.retrievers import AmazonKendraRetriever
 from langchain.chains import RetrievalQA
 from langchain.llms import AI21
 from langchain.prompts import PromptTemplate
@@ -11,9 +12,7 @@ def build_chain():
 
     llm = AI21(ai21_api_key="EwzO4lugQNJYyUhcK8tXuKOPmhyPCe3h")#OpenAI(batch_size=5, temperature=0, max_tokens=300)
 
-    retriever = KendraIndexRetriever(kendraindex=kendra_index_id, 
-        awsregion=region, 
-        return_source_documents=True)
+    retriever = AmazonKendraRetriever(index_id=kendra_index_id,region_name=region)
 
     prompt_template = """
     The following is a friendly conversation between a human and an AI. 

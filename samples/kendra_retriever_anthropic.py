@@ -1,4 +1,5 @@
-from aws_langchain.kendra_index_retriever import KendraIndexRetriever
+# from aws_langchain.kendra import AmazonKendraRetriever #custom library
+from langchain.retrievers import AmazonKendraRetriever
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 from langchain.llms import Anthropic
@@ -12,9 +13,7 @@ def build_chain():
 
     llm = Anthropic(temperature=0, anthropic_api_key=ANTHROPIC_API_KEY)
         
-    retriever = KendraIndexRetriever(kendraindex=kendra_index_id, 
-        awsregion=region, 
-        return_source_documents=True)
+    retriever = AmazonKendraRetriever(index_id=kendra_index_id,region_name=region)
 
     prompt_template = """
     The following is a friendly conversation between a human and an AI. 
