@@ -43,6 +43,7 @@ export FLAN_XL_ENDPOINT="<YOUR-SAGEMAKER-ENDPOINT-FOR-FLAN-T-XL>"
 export FLAN_XXL_ENDPOINT="<YOUR-SAGEMAKER-ENDPOINT-FOR-FLAN-T-XXL>"
 export OPENAI_API_KEY="<YOUR-OPEN-AI-API-KEY>"
 export ANTHROPIC_API_KEY="<YOUR-ANTHROPIC-API-KEY>"
+export FALCON_40B_ENDPOINT="<YOUR-SAGEMAKER-ENDPOINT-FOR-FALCON>"
 ```
 
 ### Running samples from the streamlit app
@@ -53,6 +54,9 @@ streamlit run app.py anthropic
 ```
 
 The above command will run the `kendra_chat_anthropic` as the LLM chain. In order to run a different chain, pass a different provider, for example for running the `open_ai` chain run this command `streamlit run app.py openai`.
+
+here are the list of providers
+ 'openai','anthropic','flanxl','flanxxl','falcon40b','llama2' 
 
 ### Running samples from the command line
 ```bash

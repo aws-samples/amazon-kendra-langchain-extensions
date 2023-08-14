@@ -37,6 +37,7 @@ def build_chain():
                                   ]],
                                   **model_kwargs
                                   })
+          print(input_str)
           return input_str.encode('utf-8')
       
       def transform_output(self, output: bytes) -> str:
@@ -89,6 +90,7 @@ def build_chain():
   return qa
 
 def run_chain(chain, prompt: str, history=[]):
+   print(prompt)
    return chain({"question": prompt, "chat_history": history})
 
 if __name__ == "__main__":
