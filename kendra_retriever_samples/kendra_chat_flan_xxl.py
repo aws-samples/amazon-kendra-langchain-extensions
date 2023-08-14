@@ -35,7 +35,6 @@ def build_chain():
       
       def transform_output(self, output: bytes) -> str:
           response_json = json.loads(output.read().decode("utf-8"))
-          print(response_json)
           return response_json["generated_texts"][0]
 
   content_handler = ContentHandler()
