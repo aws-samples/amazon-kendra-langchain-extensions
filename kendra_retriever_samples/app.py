@@ -17,7 +17,7 @@ PROVIDER_MAP = {
     'anthropic': 'Anthropic',
     'flanxl': 'Flan XL',
     'flanxxl': 'Flan XXL',
-    'falcon40b': 'Falcon 40B'
+    'falcon40b': 'Falcon 40B',
     'llama2' : 'Llama 2'
 }
 
