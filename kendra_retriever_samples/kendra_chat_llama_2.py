@@ -1,49 +1,58 @@
 from langchain.retrievers import AmazonKendraRetriever
 from langchain.chains import ConversationalRetrievalChain
+from langchain.prompts import PromptTemplate
 from langchain import SagemakerEndpoint
 from langchain.llms.sagemaker_endpoint import LLMContentHandler
-from langchain.prompts import PromptTemplate
 import sys
 import json
 import os
 
 class bcolors:
-  HEADER = '\033[95m'
-  OKBLUE = '\033[94m'
-  OKCYAN = '\033[96m'
-  OKGREEN = '\033[92m'
-  WARNING = '\033[93m'
-  FAIL = '\033[91m'
-  ENDC = '\033[0m'
-  BOLD = '\033[1m'
-  UNDERLINE = '\033[4m'
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 MAX_HISTORY_LENGTH = 5
 
 def build_chain():
   region = os.environ["AWS_REGION"]
   kendra_index_id = os.environ["KENDRA_INDEX_ID"]
-  endpoint_name = os.environ["FLAN_XXL_ENDPOINT"]
+  endpoint_name = os.environ["LLAMA_2_ENDPOINT"]
 
   class ContentHandler(LLMContentHandler):
       content_type = "application/json"
       accepts = "application/json"
 
       def transform_input(self, prompt: str, model_kwargs: dict) -> bytes:
-          input_str = json.dumps({"text_inputs": prompt, **model_kwargs})
+          input_str = json.dumps({"inputs": 
+                                  [[
+                                    #{"role": "system", "content": ""},
+                                    {"role": "user", "content": prompt},
+                                  ]],
+                                  **model_kwargs
+                                  })
+          print(input_str)
           return input_str.encode('utf-8')
       
       def transform_output(self, output: bytes) -> str:
           response_json = json.loads(output.read().decode("utf-8"))
-          return response_json["generated_texts"][0]
+          
+          return response_json[0]['generation']['content']
 
   content_handler = ContentHandler()
 
   llm=SagemakerEndpoint(
           endpoint_name=endpoint_name, 
           region_name=region, 
-          model_kwargs={"temperature":1e-10, "max_length": 500},
-          content_handler=content_handler
+          model_kwargs={"max_new_tokens": 1000, "top_p": 0.9,"temperature":0.6},
+          endpoint_kwargs={"CustomAttributes":"accept_eula=true"},
+          content_handler=content_handler,
       )
       
   retriever = AmazonKendraRetriever(index_id=kendra_index_id,region_name=region)
@@ -58,7 +67,7 @@ def build_chain():
   if not present in the document. 
   Solution:"""
   PROMPT = PromptTemplate(
-      template=prompt_template, input_variables=["context", "question"]
+      template=prompt_template, input_variables=["context", "question"],
   )
 
   condense_qa_template = """
@@ -76,11 +85,13 @@ def build_chain():
         retriever=retriever, 
         condense_question_prompt=standalone_question_prompt, 
         return_source_documents=True, 
-        combine_docs_chain_kwargs={"prompt":PROMPT})
+        combine_docs_chain_kwargs={"prompt":PROMPT},
+        )
   return qa
 
 def run_chain(chain, prompt: str, history=[]):
-  return chain({"question": prompt, "chat_history": history})
+   print(prompt)
+   return chain({"question": prompt, "chat_history": history})
 
 if __name__ == "__main__":
   chat_history = []

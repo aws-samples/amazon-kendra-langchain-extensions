@@ -6,7 +6,8 @@ import kendra_chat_anthropic as anthropic
 import kendra_chat_flan_xl as flanxl
 import kendra_chat_flan_xxl as flanxxl
 import kendra_chat_open_ai as openai
-
+import kendra_chat_falcon_40b as falcon40b
+import kendra_chat_llama_2 as llama2
 
 USER_ICON = "images/user-icon.png"
 AI_ICON = "images/ai-icon.png"
@@ -15,7 +16,9 @@ PROVIDER_MAP = {
     'openai': 'Open AI',
     'anthropic': 'Anthropic',
     'flanxl': 'Flan XL',
-    'flanxxl': 'Flan XXL'
+    'flanxxl': 'Flan XXL',
+    'falcon40b': 'Falcon 40B',
+    'llama2' : 'Llama 2'
 }
 
 # Check if the user ID is already stored in the session state
@@ -42,6 +45,12 @@ if 'llm_chain' not in st.session_state:
         elif (sys.argv[1] == 'openai'):
             st.session_state['llm_app'] = openai
             st.session_state['llm_chain'] = openai.build_chain()
+        elif (sys.argv[1] == 'falcon40b'):
+            st.session_state['llm_app'] = falcon40b
+            st.session_state['llm_chain'] = falcon40b.build_chain()
+        elif (sys.argv[1] == 'llama2'):
+            st.session_state['llm_app'] = llama2
+            st.session_state['llm_chain'] = llama2.build_chain()
         else:
             raise Exception("Unsupported LLM: ", sys.argv[1])
     else:
