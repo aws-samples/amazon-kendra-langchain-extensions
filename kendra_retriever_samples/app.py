@@ -8,6 +8,7 @@ import kendra_chat_flan_xxl as flanxxl
 import kendra_chat_open_ai as openai
 import kendra_chat_falcon_40b as falcon40b
 import kendra_chat_llama_2 as llama2
+import kendra_chat_bedrock_titan as titan
 
 USER_ICON = "images/user-icon.png"
 AI_ICON = "images/ai-icon.png"
@@ -18,7 +19,8 @@ PROVIDER_MAP = {
     'flanxl': 'Flan XL',
     'flanxxl': 'Flan XXL',
     'falcon40b': 'Falcon 40B',
-    'llama2' : 'Llama 2'
+    'llama2' : 'Llama 2',
+    'titan' : 'Amazon Bedrock Titan'
 }
 
 # Check if the user ID is already stored in the session state
@@ -51,10 +53,13 @@ if 'llm_chain' not in st.session_state:
         elif (sys.argv[1] == 'llama2'):
             st.session_state['llm_app'] = llama2
             st.session_state['llm_chain'] = llama2.build_chain()
+        elif (sys.argv[1] == 'titan'):
+            st.session_state['llm_app'] = titan
+            st.session_state['llm_chain'] = titan.build_chain()
         else:
             raise Exception("Unsupported LLM: ", sys.argv[1])
     else:
-        raise Exception("Usage: streamlit run app.py <anthropic|flanxl|flanxxl|openai>")
+        raise Exception("Usage: streamlit run app.py <anthropic|flanxl|flanxxl|openai|titan>")
 
 if 'chat_history' not in st.session_state:
     st.session_state['chat_history'] = []
