@@ -35,7 +35,7 @@ def build_chain():
                                     #{"role": "system", "content": ""},
                                     {"role": "user", "content": prompt},
                                   ]],
-                                  **model_kwargs
+                                  "parameters": {**model_kwargs}
                                   })
           print(input_str)
           return input_str.encode('utf-8')
