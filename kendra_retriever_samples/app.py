@@ -8,6 +8,7 @@ import kendra_chat_flan_xxl as flanxxl
 import kendra_chat_open_ai as openai
 import kendra_chat_falcon_40b as falcon40b
 import kendra_chat_llama_2 as llama2
+import kendra_chat_bedrock as bedrock
 
 USER_ICON = "images/user-icon.png"
 AI_ICON = "images/ai-icon.png"
@@ -20,6 +21,17 @@ PROVIDER_MAP = {
     'falcon40b': 'Falcon 40B',
     'llama2' : 'Llama 2'
 }
+
+#function to read a properties file and create environment variables
+def read_properties_file(filename):
+    import os
+    import re
+    with open(filename, 'r') as f:
+        for line in f:
+            m = re.match(r'^\s*(\w+)\s*=\s*(.*)\s*$', line)
+            if m:
+                os.environ[m.group(1)] = m.group(2)
+
 
 # Check if the user ID is already stored in the session state
 if 'user_id' in st.session_state:
@@ -51,10 +63,13 @@ if 'llm_chain' not in st.session_state:
         elif (sys.argv[1] == 'llama2'):
             st.session_state['llm_app'] = llama2
             st.session_state['llm_chain'] = llama2.build_chain()
+        elif (sys.argv[1] == 'bedrock'):
+            st.session_state['llm_app'] = bedrock
+            st.session_state['llm_chain'] = bedrock.build_chain()
         else:
             raise Exception("Unsupported LLM: ", sys.argv[1])
     else:
-        raise Exception("Usage: streamlit run app.py <anthropic|flanxl|flanxxl|openai>")
+        raise Exception("Usage: streamlit run app.py <anthropic|flanxl|flanxxl|openai|bedrock>")
 
 if 'chat_history' not in st.session_state:
     st.session_state['chat_history'] = []

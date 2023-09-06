@@ -30,14 +30,12 @@ def build_chain():
       accepts = "application/json"
 
       def transform_input(self, prompt: str, model_kwargs: dict) -> bytes:
-          prompt = prompt[:1023]
+    
           input_str = json.dumps({"inputs": prompt, "parameters": model_kwargs})
-          print("input_str", input_str)
           return input_str.encode('utf-8')
       
       def transform_output(self, output: bytes) -> str:
           response_json = json.loads(output.read().decode("utf-8"))
-          print(response_json)
           return response_json[0]["generated_text"]
 
   content_handler = ContentHandler()
@@ -47,7 +45,6 @@ def build_chain():
           region_name=region, 
           model_kwargs={
                         "temperature": 0.8, 
-                        "max_length": 10000, 
                         "max_new_tokens": 512, 
                         "do_sample": True, 
                         "top_p": 0.9,
@@ -57,13 +54,9 @@ def build_chain():
           content_handler=content_handler
       )
       
-  retriever = AmazonKendraRetriever(index_id=kendra_index_id,region_name=region)
+  retriever = AmazonKendraRetriever(index_id=kendra_index_id,region_name=region, top_k=2)
 
   prompt_template = """
-  The following is a friendly conversation between a human and an AI. 
-  The AI is talkative and provides lots of specific details from its context.
-  If the AI does not know the answer to a question, it truthfully says it 
-  does not know.
   {context}
   Instruction: Based on the above documents, provide a detailed answer for, {question} Answer "don't know" 
   if not present in the document. 
