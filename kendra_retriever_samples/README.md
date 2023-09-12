@@ -40,6 +40,7 @@ Before you run the sample, you need to deploy a Large Language Model (or get an 
 | Flan XXL | FLAN_XXL_ENDPOINT | huggingface-text2text-flan-t5-xxl | flanxxl |
 | Falcon 40B instruct | FALCON_40B_ENDPOINT | huggingface-llm-falcon-40b-instruct-bf16 | falcon40b |
 | Llama2 70B instruct | LLAMA_2_ENDPOINT | meta-textgeneration-llama-2-70b-f | llama2 |
+| Bedrock | BEDROCK_MODEL |amazon.titan-tg1-large | bedrock|
 
 
 after deploying the LLM, set up environment variables for kendra id, aws_region and the endpoint name (or the API key for an external provider)
@@ -50,7 +51,9 @@ You can use commands as below to set the environment variables. Only set the env
 
 ```bash
 export AWS_REGION="<YOUR-AWS-REGION>"
+export AWS_PROFILE=bedrock
 export KENDRA_INDEX_ID="<YOUR-KENDRA-INDEX-ID>"
+
 export FLAN_XL_ENDPOINT="<YOUR-SAGEMAKER-ENDPOINT-FOR-FLAN-T-XL>" # only if you are using FLAN_XL
 export FLAN_XXL_ENDPOINT="<YOUR-SAGEMAKER-ENDPOINT-FOR-FLAN-T-XXL>" # only if you are using FLAN_XXL
 export FALCON_40B_ENDPOINT="<YOUR-SAGEMAKER-ENDPOINT-FOR-FALCON>" # only if you are using falcon as the endpoint

@@ -23,7 +23,9 @@ def build_chain():
   region = os.environ["AWS_REGION"]
   kendra_index_id = os.environ["KENDRA_INDEX_ID"]
   credentials_profile_name = os.environ['AWS_PROFILE']
-  print(region)
+
+  print(credentials_profile_name)
+
 
   llm = Bedrock(
       credentials_profile_name=credentials_profile_name,
