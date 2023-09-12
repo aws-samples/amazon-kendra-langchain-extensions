@@ -30,6 +30,15 @@ If you are using Conda
 conda env create -f environment.yml 
 ```
 
+### For Bedrock
+If you are using Bedrock, make sure that you have a boto3 client with bedrock library and you use an AWS_PROFILE  that has access to bedrock.
+
+```
+wget https://xxxxx/Documentation/SDK/bedrock-python-sdk.zip
+unzip bedrock-python-sdk.zip 
+pip install *.whl
+```
+
 ## Running samples
 Before you run the sample, you need to deploy a Large Language Model (or get an API key if you using Anthropic or OPENAI). The samples in this repository have been tested on models deployed using SageMaker Jumpstart.  The model id for the LLMS are specified in the table below.
 
