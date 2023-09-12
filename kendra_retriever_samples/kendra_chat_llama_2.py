@@ -47,6 +47,7 @@ def build_chain():
           model_kwargs={"max_new_tokens": 1500, "top_p": 0.8,"temperature":0.6},
           endpoint_kwargs={"CustomAttributes":"accept_eula=true"},
           content_handler=content_handler,
+
       )
       
   retriever = AmazonKendraRetriever(index_id=kendra_index_id,region_name=region)
@@ -80,6 +81,7 @@ def build_chain():
         condense_question_prompt=standalone_question_prompt, 
         return_source_documents=True, 
         combine_docs_chain_kwargs={"prompt":PROMPT},
+        verbose=True
         )
   return qa
 

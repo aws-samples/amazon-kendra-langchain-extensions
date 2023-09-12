@@ -80,6 +80,7 @@ def build_chain():
         retriever=retriever, 
         condense_question_prompt=standalone_question_prompt, 
         return_source_documents=True, 
+        verbose =True,
         combine_docs_chain_kwargs={"prompt":PROMPT})
   return qa
 
