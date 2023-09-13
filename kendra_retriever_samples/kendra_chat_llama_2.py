@@ -30,19 +30,13 @@ def build_chain():
       accepts = "application/json"
 
       def transform_input(self, prompt: str, model_kwargs: dict) -> bytes:
-          input_str = json.dumps({"inputs": 
-                                  [[
-                                    #{"role": "system", "content": ""},
-                                    {"role": "user", "content": prompt},
-                                  ]],
-                                  **model_kwargs
+          input_str = json.dumps({"inputs": [[{"role": "user", "content": prompt},]],
+                                  "parameters" : model_kwargs
                                   })
-          print(input_str)
           return input_str.encode('utf-8')
       
       def transform_output(self, output: bytes) -> str:
-          response_json = json.loads(output.read().decode("utf-8"))
-          
+          response_json = json.loads(output.read().decode("utf-8")) 
           return response_json[0]['generation']['content']
 
   content_handler = ContentHandler()
@@ -50,9 +44,10 @@ def build_chain():
   llm=SagemakerEndpoint(
           endpoint_name=endpoint_name, 
           region_name=region, 
-          model_kwargs={"max_new_tokens": 1000, "top_p": 0.9,"temperature":0.6},
+          model_kwargs={"max_new_tokens": 1500, "top_p": 0.8,"temperature":0.6},
           endpoint_kwargs={"CustomAttributes":"accept_eula=true"},
           content_handler=content_handler,
+
       )
       
   retriever = AmazonKendraRetriever(index_id=kendra_index_id,region_name=region)
@@ -69,7 +64,6 @@ def build_chain():
   PROMPT = PromptTemplate(
       template=prompt_template, input_variables=["context", "question"],
   )
-
   condense_qa_template = """
   Given the following conversation and a follow up question, rephrase the follow up question 
   to be a standalone question.
@@ -79,6 +73,7 @@ def build_chain():
   Follow Up Input: {question}
   Standalone question:"""
   standalone_question_prompt = PromptTemplate.from_template(condense_qa_template)
+ 
 
   qa = ConversationalRetrievalChain.from_llm(
         llm=llm, 
@@ -86,11 +81,11 @@ def build_chain():
         condense_question_prompt=standalone_question_prompt, 
         return_source_documents=True, 
         combine_docs_chain_kwargs={"prompt":PROMPT},
+        verbose=True
         )
   return qa
 
 def run_chain(chain, prompt: str, history=[]):
-   print(prompt)
    return chain({"question": prompt, "chat_history": history})
 
 if __name__ == "__main__":

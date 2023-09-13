@@ -1,91 +1,91 @@
+# from aws_langchain.kendra import AmazonKendraRetriever #custom library
 from langchain.retrievers import AmazonKendraRetriever
 from langchain.chains import ConversationalRetrievalChain
-from langchain import SagemakerEndpoint
-from langchain.llms.sagemaker_endpoint import LLMContentHandler
 from langchain.prompts import PromptTemplate
+from langchain.llms.bedrock import Bedrock
+from langchain.chains.llm import LLMChain
 import sys
-import json
 import os
 
 class bcolors:
-  HEADER = '\033[95m'
-  OKBLUE = '\033[94m'
-  OKCYAN = '\033[96m'
-  OKGREEN = '\033[92m'
-  WARNING = '\033[93m'
-  FAIL = '\033[91m'
-  ENDC = '\033[0m'
-  BOLD = '\033[1m'
-  UNDERLINE = '\033[4m'
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 MAX_HISTORY_LENGTH = 5
 
 def build_chain():
   region = os.environ["AWS_REGION"]
   kendra_index_id = os.environ["KENDRA_INDEX_ID"]
-  endpoint_name = os.environ["FALCON_40B_ENDPOINT"]
+  credentials_profile_name = os.environ['AWS_PROFILE']
 
-  class ContentHandler(LLMContentHandler):
-      content_type = "application/json"
-      accepts = "application/json"
+  print(credentials_profile_name)
 
-      def transform_input(self, prompt: str, model_kwargs: dict) -> bytes:
-    
-          input_str = json.dumps({"inputs": prompt, "parameters": model_kwargs})
-          return input_str.encode('utf-8')
+
+  llm = Bedrock(
+      credentials_profile_name=credentials_profile_name,
+      region_name = region,
+      model_kwargs={"max_tokens_to_sample":300,"temperature":1,"top_k":250,"top_p":0.999,"anthropic_version":"bedrock-2023-05-31"},
+      model_id="anthropic.claude-v1"
+  )
       
-      def transform_output(self, output: bytes) -> str:
-          response_json = json.loads(output.read().decode("utf-8"))
-          return response_json[0]["generated_text"]
+  retriever = AmazonKendraRetriever(index_id=kendra_index_id,top_k=5,region_name=region)
 
-  content_handler = ContentHandler()
 
-  llm=SagemakerEndpoint(
-          endpoint_name=endpoint_name, 
-          region_name=region, 
-          model_kwargs={
-                        "temperature": 0.8, 
-                        "max_new_tokens": 512, 
-                        "do_sample": True, 
-                        "top_p": 0.9,
-                        "repetition_penalty": 1.03,
-                        "stop": ["\nUser:","<|endoftext|>","</s>"]
-                     },
-          content_handler=content_handler
-      )
-      
-  retriever = AmazonKendraRetriever(index_id=kendra_index_id,region_name=region, top_k=2)
+  prompt_template = """Human: This is a friendly conversation between a human and an AI. 
+  The AI is talkative and provides specific details from its context but limits it to 240 tokens.
+  If the AI does not know the answer to a question, it truthfully says it 
+  does not know.
 
-  prompt_template = """
+  Assistant: OK, got it, I'll be a talkative truthful AI assistant.
+
+  Human: Here are a few documents in <documents> tags:
+  <documents>
   {context}
-  Instruction: Based on the above documents, provide a detailed answer for, {question} Answer "don't know" 
-  if not present in the document. 
-  Solution:"""
+  </documents>
+  Based on the above documents, provide a detailed answer for, {question} 
+  Answer "don't know" if not present in the document. 
+
+  Assistant:
+  """
   PROMPT = PromptTemplate(
       template=prompt_template, input_variables=["context", "question"]
   )
 
-  condense_qa_template = """
+  condense_qa_template = """Human: 
   Given the following conversation and a follow up question, rephrase the follow up question 
   to be a standalone question.
-
   Chat History:
   {chat_history}
   Follow Up Input: {question}
-  Standalone question:"""
+  Standalone question: 
+
+  Assistant:"""
   standalone_question_prompt = PromptTemplate.from_template(condense_qa_template)
 
+
+  
   qa = ConversationalRetrievalChain.from_llm(
         llm=llm, 
         retriever=retriever, 
         condense_question_prompt=standalone_question_prompt, 
         return_source_documents=True, 
-        verbose =True,
-        combine_docs_chain_kwargs={"prompt":PROMPT})
+        combine_docs_chain_kwargs={"prompt":PROMPT},
+        verbose=True)
+
+  # qa = ConversationalRetrievalChain.from_llm(llm=llm, retriever=retriever, qa_prompt=PROMPT, return_source_documents=True)
   return qa
+
 
 def run_chain(chain, prompt: str, history=[]):
   return chain({"question": prompt, "chat_history": history})
+
 
 if __name__ == "__main__":
   chat_history = []
