@@ -1,5 +1,5 @@
-langchain==0.0.279
-boto3>=1.28.27
+langchain>=0.0.306
+boto3>=1.28.57
 openai
 anthropic
 streamlit
