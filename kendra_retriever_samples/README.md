@@ -31,12 +31,11 @@ conda env create -f environment.yml
 ```
 
 ### For Bedrock
-If you are using Bedrock, make sure that you have a boto3 client with bedrock library and you use an AWS_PROFILE  that has access to bedrock.
+If you are using Bedrock, make sure that you update to the latest boto3 and langchain version with bedrock support and you use an AWS_PROFILE  that has access to bedrock.
 
 ```
-wget https://xxxxx/Documentation/SDK/bedrock-python-sdk.zip
-unzip bedrock-python-sdk.zip 
-pip install *.whl
+pip install --force-reinstall "langchain>=0.0.306"
+pip install --force-reinstall "boto3>=1.28.57"
 ```
 
 ## Running samples
