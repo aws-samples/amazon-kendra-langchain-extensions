@@ -58,13 +58,13 @@ def build_chain():
       template=prompt_template, input_variables=["context", "question"]
   )
 
-  condense_qa_template = """Human: 
-  Given the following conversation and a follow up question, rephrase the follow up question 
+  condense_qa_template = """{chat_history}
+  Human:
+  Given the previous conversation and a follow up question below, rephrase the follow up question
   to be a standalone question.
-  Chat History:
-  {chat_history}
-  Follow Up Input: {question}
-  Standalone question: 
+
+  Follow Up Question: {question}
+  Standalone Question:
 
   Assistant:"""
   standalone_question_prompt = PromptTemplate.from_template(condense_qa_template)
