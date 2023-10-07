@@ -12,7 +12,9 @@ import kendra_chat_bedrock_titan as bedrock_titan
 import kendra_chat_bedrock_claude as bedrock_claude
 import kendra_chat_bedrock_claudev2 as bedrock_claudev2
 
+from dotenv import load_dotenv
 
+load_dotenv()
 
 USER_ICON = "images/user-icon.png"
 AI_ICON = "images/ai-icon.png"
