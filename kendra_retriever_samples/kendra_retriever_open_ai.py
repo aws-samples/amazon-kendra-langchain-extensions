@@ -3,7 +3,9 @@ from langchain.chains import RetrievalQA
 from langchain import OpenAI
 from langchain.prompts import PromptTemplate
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
 def build_chain():
   region = os.environ["AWS_REGION"]

@@ -4,10 +4,15 @@ from langchain.prompts import PromptTemplate
 from langchain import OpenAI
 import sys
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 MAX_HISTORY_LENGTH = 5
 
 def build_chain():
+  print(os.environ)
   region = os.environ["AWS_REGION"]
   kendra_index_id = os.environ["KENDRA_INDEX_ID"]
 
