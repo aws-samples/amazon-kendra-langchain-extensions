@@ -1,4 +1,4 @@
-langchain==0.0.306
+langchain==0.0.312
 boto3>=1.28.27
 openai
 anthropic
