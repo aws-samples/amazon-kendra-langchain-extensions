@@ -84,8 +84,6 @@ export ANTHROPIC_API_KEY=<YOUR-ANTHROPIC-API-KEY> #  only if you are using Anthr
 streamlit run app.py llama2
 ```
 
-The above command will run the `kendra_chat_llama_2` as the LLM chain. In order to run a different chain, pass a different provider, for example for running the `open_ai` chain run this command `streamlit run app.py openai`. Use the column 'streamlit provider name' from the table above to find out the provider name
-
 上記のコマンドは、LLM チェーンとして `kendra_chat_llama_2` を実行します。異なるチェーンを実行するには、異なるプロバイダーを渡してください。たとえば、`open_ai` チェーンを実行する場合は `streamlit run app.py openai` を実行します。テーブル上の「streamlitプロバイダ名」列を活用してプロバイダ名を確認してください。
 
 ### コマンドラインからのサンプルの実行
