@@ -55,9 +55,8 @@ if "llm_chain" not in st.session_state:
         else:
             raise Exception("Unsupported LLM: ", sys.argv[1])
     else:
-        raise Exception(
-            "Usage: streamlit run app.py <anthropic|flanxl|flanxxl|openai|bedrock_titan|bedrock_claude|bedrock|claudev2>"
-        )
+        raise Exception("Usage: streamlit run app.py <openai|falcon40b|bedrock_claude|bedrock|claudev2>")
+
 
 if "chat_history" not in st.session_state:
     st.session_state["chat_history"] = []
