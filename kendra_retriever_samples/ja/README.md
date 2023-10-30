@@ -40,24 +40,20 @@ pip install --force-reinstall "boto3>=1.28.57"
 ```
 
 ## サンプルの実行
-サンプルを実行する前に、Large Language Model をデプロイする（または Anthropic や OpenAI を使用する場合は API キーを取得する）必要があります。このリポジトリのサンプルは、SageMaker Jumpstart を使用して展開されたモデルでテストされています。 LLM のモデル ID は以下の表にまとめられています。
+サンプルを実行する前に、Large Language Model をデプロイする（または Anthropic や OpenAI を使用する場合は API キーを取得する）必要があります。このリポジトリのサンプルは、SageMaker Jumpstart と Amazon Bedrock を使用して展開されたモデルでテストされています。 LLM のモデル ID は以下の表にまとめられています。
 
 | モデル名            | 環境変数名          | Jumpstart モデル ID                      | streamlit プロバイダ | 日本語対応 |
 | ------------------- | ------------------- | ---------------------------------------- | -------------------- | ---------- |
-| Flan XL             | FLAN_XL_ENDPOINT    | huggingface-text2text-flan-t5-xl         | flanxl               | No         |
-| Flan XXL            | FLAN_XXL_ENDPOINT   | huggingface-text2text-flan-t5-xxl        | flanxxl              | No         |
-| Falcon 40B instruct | FALCON_40B_ENDPOINT | huggingface-llm-falcon-40b-instruct-bf16 | falcon40b            | Yes        |
-| Llama2 70B instruct | LLAMA_2_ENDPOINT    | meta-textgeneration-llama-2-70b-f        | llama2               | No         |
-| Bedrock Titan       | None                |                                          | bedrock_titan        | No         |
-| Bedrock Claude      | None                |                                          | bedrock_claude       | Yes        |
-| Bedrock Claude V2   | None                |                                          | bedrock_claudev2     | Yes        |
+| Falcon 40B instruct | FALCON_40B_ENDPOINT | huggingface-llm-falcon-40b-instruct-bf16 | falcon40b            |
+| Bedrock Claude      | None                |                                          | bedrock_claude       |
+| Bedrock Claude V2   | None                |                                          | bedrock_claudev2     |
 
 LLMをデプロイした後、kendra ID、aws_region、エンドポイント名（または外部プロバイダーの API キー）の環境変数を設定する必要があります。
 
-例えば、`kendra_chat_llama_2.py` のサンプルを実行する場合、以下の環境変数を設定する必要があります
+例えば、`kendra_chat_open_ai.py` のサンプルを実行する場合、以下の環境変数を設定する必要があります
 - AWS_REGION
 - KENDRA_INDEX_ID
-- LLAMA_2_ENDPOINT
+- OPENAI_API_KEY
 
 以下のコマンドを使用して環境変数を設定できます。使用するプロバイダーの環境変数のみを設定します。たとえば、Flan-xl を使用する場合は FLAN_XXL_ENDPOINT のみを設定します。他のエンドポイントとキーは設定する必要はありません。
 
@@ -67,13 +63,8 @@ export AWS_REGION=<YOUR-AWS-REGION>
 export AWS_PROFILE=<AWS Profile>
 export KENDRA_INDEX_ID=<YOUR-KENDRA-INDEX-ID>
 
-export FLAN_XL_ENDPOINT=<YOUR-SAGEMAKER-ENDPOINT-FOR-FLAN-T-XL> # only if you are using FLAN_XL
-export FLAN_XXL_ENDPOINT=<YOUR-SAGEMAKER-ENDPOINT-FOR-FLAN-T-XXL> # only if you are using FLAN_XXL
 export FALCON_40B_ENDPOINT=<YOUR-SAGEMAKER-ENDPOINT-FOR-FALCON> # only if you are using falcon as the endpoint
-export LLAMA_2_ENDPOINT=<YOUR-SAGEMAKER-ENDPOINT-FOR-LLAMA2> #only if you are using llama2 as the endpoint
-
 export OPENAI_API_KEY=<YOUR-OPEN-AI-API-KEY> #  only if you are using OPENAI as the endpoint
-export ANTHROPIC_API_KEY=<YOUR-ANTHROPIC-API-KEY> #  only if you are using Anthropic as the endpoint
 ```
 
 
@@ -81,10 +72,10 @@ export ANTHROPIC_API_KEY=<YOUR-ANTHROPIC-API-KEY> #  only if you are using Anthr
 サンプルディレクトリには、streamlit を使用してウェブアプリとして実行できる `app.py` ファイルが含まれています。
 
 ```bash
-streamlit run app.py llama2
+streamlit run app.py falcon40b
 ```
 
-上記のコマンドは、LLM チェーンとして `kendra_chat_llama_2` を実行します。異なるチェーンを実行するには、異なるプロバイダーを渡してください。たとえば、`open_ai` チェーンを実行する場合は `streamlit run app.py openai` を実行します。テーブル上の「streamlitプロバイダ名」列を活用してプロバイダ名を確認してください。
+上記のコマンドは、LLM チェーンとして `kendra_chat_falcon_40b` を実行します。異なるチェーンを実行するには、異なるプロバイダーを渡してください。たとえば、`open_ai` チェーンを実行する場合は `streamlit run app.py openai` を実行します。テーブル上の「streamlitプロバイダ名」列を活用してプロバイダ名を確認してください。
 
 ### コマンドラインからのサンプルの実行
 ```bash
