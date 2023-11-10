@@ -61,6 +61,7 @@ You can use commands as below to set the environment variables. Only set the env
 
 ```bash
 export AWS_REGION=<YOUR-AWS-REGION>
+export AWS_BEDROCK_REGION=<YOUR-AWS-BEDROCK-REGION>
 export AWS_PROFILE=<AWS Profile>
 export KENDRA_INDEX_ID=<YOUR-KENDRA-INDEX-ID>
 

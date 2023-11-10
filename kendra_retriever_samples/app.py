@@ -11,6 +11,7 @@ import kendra_chat_llama_2 as llama2
 import kendra_chat_bedrock_titan as bedrock_titan
 import kendra_chat_bedrock_claude as bedrock_claude
 import kendra_chat_bedrock_claudev2 as bedrock_claudev2
+import kendra_chat_bedrock_jurassic_ultra as bedrock_jurassic_ultra
 
 
 
@@ -76,10 +77,13 @@ if 'llm_chain' not in st.session_state:
         elif (sys.argv[1] == 'bedrock_claudev2'):
             st.session_state['llm_app'] = bedrock_claudev2
             st.session_state['llm_chain'] = bedrock_claudev2.build_chain()
+        elif (sys.argv[1] == 'bedrock_jurassic_ultra'):
+            st.session_state['llm_app'] = bedrock_jurassic_ultra
+            st.session_state['llm_chain'] = bedrock_jurassic_ultra.build_chain()
         else:
             raise Exception("Unsupported LLM: ", sys.argv[1])
     else:
-        raise Exception("Usage: streamlit run app.py <anthropic|flanxl|flanxxl|openai|bedrock_titan|bedrock_claude|bedrock|claudev2>")
+        raise Exception("Usage: streamlit run app.py <anthropic|flanxl|flanxxl|openai|bedrock_titan|bedrock_claude|bedrock|claudev2|jurassic_ultra>")
 
 if 'chat_history' not in st.session_state:
     st.session_state['chat_history'] = []
