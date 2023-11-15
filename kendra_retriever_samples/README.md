@@ -51,6 +51,7 @@ Before you run the sample, you need to deploy a Large Language Model (or get an 
 | Bedrock Titan | None |  | bedrock_titan|
 | Bedrock Claude | None |  | bedrock_claude|
 | Bedrock Claude V2 | None |  | bedrock_claudev2|
+| Bedrock Jurassic Ultra | None |  | bedrock_jurassic_ultra|
 
 
 after deploying the LLM, set up environment variables for kendra id, aws_region and the endpoint name (or the API key for an external provider)
