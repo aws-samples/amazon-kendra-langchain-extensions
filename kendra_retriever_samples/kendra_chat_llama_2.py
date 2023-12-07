@@ -6,6 +6,8 @@ from langchain.llms.sagemaker_endpoint import LLMContentHandler
 import sys
 import json
 import os
+from typing import Dict, List
+
 
 class bcolors:
     HEADER = '\033[95m'
@@ -30,14 +32,18 @@ def build_chain():
       accepts = "application/json"
 
       def transform_input(self, prompt: str, model_kwargs: dict) -> bytes:
-          input_str = json.dumps({"inputs": [[{"role": "user", "content": prompt},]],
+          # input_str = json.dumps({"inputs": [[{"role": "user", "content": prompt},]],
+          #                         "parameters" : model_kwargs
+          #                         })
+          input_str = json.dumps({"inputs": prompt,
                                   "parameters" : model_kwargs
                                   })
           return input_str.encode('utf-8')
       
       def transform_output(self, output: bytes) -> str:
           response_json = json.loads(output.read().decode("utf-8")) 
-          return response_json[0]['generation']['content']
+          print(response_json)
+          return response_json[0]['generated_text']
 
   content_handler = ContentHandler()
 
@@ -53,25 +59,30 @@ def build_chain():
   retriever = AmazonKendraRetriever(index_id=kendra_index_id,region_name=region)
 
   prompt_template = """
+  <s>[INST] <<SYS>>
   The following is a friendly conversation between a human and an AI. 
   The AI is talkative and provides lots of specific details from its context.
   If the AI does not know the answer to a question, it truthfully says it 
   does not know.
   {context}
+  <</SYS>>
   Instruction: Based on the above documents, provide a detailed answer for, {question} Answer "don't know" 
   if not present in the document. 
-  Solution:"""
+  Solution:
+  [/INST]"""
   PROMPT = PromptTemplate(
       template=prompt_template, input_variables=["context", "question"],
   )
   condense_qa_template = """
+  <s>[INST] <<SYS>>
   Given the following conversation and a follow up question, rephrase the follow up question 
   to be a standalone question.
 
   Chat History:
   {chat_history}
   Follow Up Input: {question}
-  Standalone question:"""
+    <</SYS>>
+  Standalone question:  [/INST]"""
   standalone_question_prompt = PromptTemplate.from_template(condense_qa_template)
  
 
@@ -81,12 +92,38 @@ def build_chain():
         condense_question_prompt=standalone_question_prompt, 
         return_source_documents=True, 
         combine_docs_chain_kwargs={"prompt":PROMPT},
-        verbose=True
+        verbose=False
         )
   return qa
 
 def run_chain(chain, prompt: str, history=[]):
+
    return chain({"question": prompt, "chat_history": history})
+
+
+def format_messages(messages: List[Dict[str, str]]) -> List[str]:
+    """Format messages for Llama-2 chat models.
+    
+    The model only supports 'system', 'user' and 'assistant' roles, starting with 'system', then 'user' and 
+    alternating (u/a/u/a/u...). The last message must be from 'user'.
+    """
+    prompt: List[str] = []
+
+    if messages[0]["role"] == "system":
+        content = "".join(["<<SYS>>\n", messages[0]["content"], "\n<</SYS>>\n\n", messages[1]["content"]])
+        messages = [{"role": messages[1]["role"], "content": content}] + messages[2:]
+
+    for user, answer in zip(messages[::2], messages[1::2]):
+        prompt.extend(["<s>", "[INST] ", (user["content"]).strip(), " [/INST] ", (answer["content"]).strip(), "</s>"])
+
+    prompt.extend(["<s>", "[INST] ", (messages[-1]["content"]).strip(), " [/INST] "])
+
+    return "".join(prompt)
+
+
+def print_messages(prompt: str, response: str) -> None:
+    bold, unbold = '\033[1m', '\033[0m'
+    print(f"{bold}> Input{unbold}\n{prompt}\n\n{bold}> Output{unbold}\n{response[0]['generated_text']}\n")
 
 if __name__ == "__main__":
   chat_history = []
