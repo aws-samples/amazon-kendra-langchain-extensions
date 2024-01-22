@@ -23,17 +23,22 @@ MAX_HISTORY_LENGTH = 5
 def build_chain():
   region = os.environ["AWS_REGION"]
   kendra_index_id = os.environ["KENDRA_INDEX_ID"]
-  credentials_profile_name = os.environ['AWS_PROFILE']
 
-  print(credentials_profile_name)
-
-
-  llm = Bedrock(
+  if "AWS_PROFILE" in os.environ:
+    credentials_profile_name = os.environ['AWS_PROFILE']
+    print("Using " + credentials_profile_name + " profile.")
+    llm = Bedrock(
       credentials_profile_name=credentials_profile_name,
       region_name = region,
       model_kwargs={"max_tokens_to_sample":300,"temperature":1,"top_k":250,"top_p":0.999,"anthropic_version":"bedrock-2023-05-31"},
       model_id="anthropic.claude-v2"
-  )
+    )
+  else:
+    llm = Bedrock(
+      region_name = region,
+      model_kwargs={"max_tokens_to_sample":300,"temperature":1,"top_k":250,"top_p":0.999,"anthropic_version":"bedrock-2023-05-31"},
+      model_id="anthropic.claude-v2"
+    )
       
   retriever = AmazonKendraRetriever(index_id=kendra_index_id,top_k=5,region_name=region)
 
