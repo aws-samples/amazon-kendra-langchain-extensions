@@ -24,6 +24,9 @@ def build_chain():
   region = os.environ["AWS_REGION"]
   kendra_index_id = os.environ["KENDRA_INDEX_ID"]
   endpoint_name = os.environ["FALCON_40B_ENDPOINT"]
+  if "INFERENCE_COMPONENT_NAME" in os.environ:
+    inference_component_name = os.environ["INFERENCE_COMPONENT_NAME"]
+
 
   class ContentHandler(LLMContentHandler):
       content_type = "application/json"
@@ -40,7 +43,8 @@ def build_chain():
 
   content_handler = ContentHandler()
 
-  llm=SagemakerEndpoint(
+  if inference_component_name:
+    llm=SagemakerEndpoint(
           endpoint_name=endpoint_name, 
           region_name=region, 
           model_kwargs={
@@ -49,10 +53,29 @@ def build_chain():
                         "do_sample": True, 
                         "top_p": 0.9,
                         "repetition_penalty": 1.03,
-                        "stop": ["\nUser:","<|endoftext|>","</s>"]
+                        "stop": ["\nUser:","<|endoftext|>","</s>"],
+                     },
+          endpoint_kwargs={"CustomAttributes":"accept_eula=true",
+                            "InferenceComponentName":inference_component_name},
+          content_handler=content_handler
+      )
+  else :
+    llm=SagemakerEndpoint(
+          endpoint_name=endpoint_name, 
+          region_name=region, 
+          model_kwargs={
+                        "temperature": 0.8, 
+                        "max_new_tokens": 512, 
+                        "do_sample": True, 
+                        "top_p": 0.9,
+                        "repetition_penalty": 1.03,
+                        "stop": ["\nUser:","<|endoftext|>","</s>"],
                      },
           content_handler=content_handler
       )
+
+
+  
       
   retriever = AmazonKendraRetriever(index_id=kendra_index_id,region_name=region, top_k=2)
 
