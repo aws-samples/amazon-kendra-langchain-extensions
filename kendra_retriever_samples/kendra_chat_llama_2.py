@@ -1,7 +1,7 @@
 from langchain.retrievers import AmazonKendraRetriever
 from langchain.chains import ConversationalRetrievalChain
 from langchain.prompts import PromptTemplate
-from langchain import SagemakerEndpoint
+from langchain.llms import SagemakerEndpoint
 from langchain.llms.sagemaker_endpoint import LLMContentHandler
 import sys
 import json
@@ -26,6 +26,8 @@ def build_chain():
   region = os.environ["AWS_REGION"]
   kendra_index_id = os.environ["KENDRA_INDEX_ID"]
   endpoint_name = os.environ["LLAMA_2_ENDPOINT"]
+  if "INFERENCE_COMPONENT_NAME" in os.environ:
+    inference_component_name = os.environ["INFERENCE_COMPONENT_NAME"]
 
   class ContentHandler(LLMContentHandler):
       content_type = "application/json"
@@ -47,14 +49,27 @@ def build_chain():
 
   content_handler = ContentHandler()
 
-  llm=SagemakerEndpoint(
+
+
+  if 'inference_component_name' in locals():
+    llm=SagemakerEndpoint(
+          endpoint_name=endpoint_name, 
+          region_name=region, 
+          model_kwargs={"max_new_tokens": 1500, "top_p": 0.8,"temperature":0.6},
+          endpoint_kwargs={"CustomAttributes":"accept_eula=true",
+                           "InferenceComponentName":inference_component_name},
+          content_handler=content_handler,
+    )
+  else :
+    llm=SagemakerEndpoint(
           endpoint_name=endpoint_name, 
           region_name=region, 
           model_kwargs={"max_new_tokens": 1500, "top_p": 0.8,"temperature":0.6},
           endpoint_kwargs={"CustomAttributes":"accept_eula=true"},
           content_handler=content_handler,
 
-      )
+    ) 
+   
       
   retriever = AmazonKendraRetriever(index_id=kendra_index_id,region_name=region)
 

@@ -3,8 +3,6 @@ import uuid
 import sys
 
 import kendra_chat_anthropic as anthropic
-import kendra_chat_flan_xl as flanxl
-import kendra_chat_flan_xxl as flanxxl
 import kendra_chat_open_ai as openai
 import kendra_chat_falcon_40b as falcon40b
 import kendra_chat_llama_2 as llama2
@@ -20,8 +18,6 @@ MAX_HISTORY_LENGTH = 5
 PROVIDER_MAP = {
     'openai': 'Open AI',
     'anthropic': 'Anthropic',
-    'flanxl': 'Flan XL',
-    'flanxxl': 'Flan XXL',
     'falcon40b': 'Falcon 40B',
     'llama2' : 'Llama 2'
 }
@@ -52,12 +48,6 @@ if 'llm_chain' not in st.session_state:
         if (sys.argv[1] == 'anthropic'):
             st.session_state['llm_app'] = anthropic
             st.session_state['llm_chain'] = anthropic.build_chain()
-        elif (sys.argv[1] == 'flanxl'):
-            st.session_state['llm_app'] = flanxl
-            st.session_state['llm_chain'] = flanxl.build_chain()
-        elif (sys.argv[1] == 'flanxxl'):
-            st.session_state['llm_app'] = flanxxl
-            st.session_state['llm_chain'] = flanxxl.build_chain()
         elif (sys.argv[1] == 'openai'):
             st.session_state['llm_app'] = openai
             st.session_state['llm_chain'] = openai.build_chain()
