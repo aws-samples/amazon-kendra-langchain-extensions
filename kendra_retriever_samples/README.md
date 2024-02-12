@@ -41,7 +41,7 @@ pip install --force-reinstall "boto3>=1.28.57"
 ## Running samples
 Before you run the sample, you need to deploy a Large Language Model (or get an API key if you using Anthropic or OPENAI). The samples in this repository have been tested on models deployed using SageMaker JumpStart.  
 
-With the latest sagemaker release each endpoint can hold multiple models (called InferenceComponent). For JumpStart models, optionally specify the INFERENCE_COMPONENT_NAME as well as an environment variable. When you deploy JumpStart models from the new Studio console, you need to specify the environment variable INFERENCE_COMPONENT_NAME. When you deploy JumpStart models from the Studio Classic console, you do not need to specify the environment variable INFERENCE_COMPONENT_NAME.
+With the latest sagemaker release each endpoint can hold multiple models (called InferenceComponent). For JumpStart models, optionally specify the INFERENCE_COMPONENT_NAME as well as an environment variable. When you deploy JumpStart models from the new Studio console, you need to specify the environment variable INFERENCE_COMPONENT_NAME. When you deploy JumpStart models from the Studio Classic console or using the SDK, you do not need to specify the environment variable INFERENCE_COMPONENT_NAME.
 
 The model id for the LLMs are specified in the table below.
 
@@ -55,7 +55,7 @@ The model id for the LLMs are specified in the table below.
 
 After deploying the LLM, set up environment variables for kendra id, aws region, endpoint name (or the API key for an external provider), and optionally the inference component name.
 
-For example, for running the `kendra_chat_llama_2.py` sample, these environment variables must be set: AWS_REGION, KENDRA_INDEX_ID, LLAMA_2_ENDPOINT, and INFERENCE_COMPONENT_NAME if you deploy JumpStart model from the new Studio console. 
+For example, for running the `kendra_chat_llama_2.py` sample, these environment variables must be set: AWS_REGION, KENDRA_INDEX_ID, LLAMA_2_ENDPOINT, and INFERENCE_COMPONENT_NAME (if you deploy JumpStart model from the new Studio console). 
 
 You can use commands as below to set the environment variables. Only set the environment variable for the provider that you are using. For example, if you are using Falcon 40B, only set the FALCON_40B_ENDPOINT. There is no need to set the other Endpoints and keys.
 
