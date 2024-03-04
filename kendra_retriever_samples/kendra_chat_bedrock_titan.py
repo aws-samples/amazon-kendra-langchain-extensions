@@ -3,6 +3,7 @@ from langchain.retrievers import AmazonKendraRetriever
 from langchain.chains import ConversationalRetrievalChain
 from langchain.prompts import PromptTemplate
 from langchain.llms.bedrock import Bedrock
+from langchain.chains.llm import LLMChain
 import sys
 import os
 
@@ -22,16 +23,20 @@ MAX_HISTORY_LENGTH = 5
 def build_chain():
   region = os.environ["AWS_REGION"]
   kendra_index_id = os.environ["KENDRA_INDEX_ID"]
-  credentials_profile_name = os.environ['AWS_PROFILE']
 
-  print(credentials_profile_name)
-
-
-  llm = Bedrock(
+  if "AWS_PROFILE" in os.environ:
+    credentials_profile_name = os.environ['AWS_PROFILE']
+    print("Using " + credentials_profile_name + " profile.")
+    llm = Bedrock(
       credentials_profile_name=credentials_profile_name,
       region_name = region,
       model_id="amazon.titan-tg1-large"
-  )
+    )
+  else:
+    llm = Bedrock(
+      region_name = region,
+      model_id="amazon.titan-tg1-large"
+    )
       
   retriever = AmazonKendraRetriever(index_id=kendra_index_id,top_k=5,region_name=region)
 
@@ -73,7 +78,8 @@ Assistant:
         retriever=retriever, 
         condense_question_prompt=standalone_question_prompt, 
         return_source_documents=True, 
-        combine_docs_chain_kwargs={"prompt":PROMPT})
+        combine_docs_chain_kwargs={"prompt":PROMPT},
+        verbose=True)
 
   # qa = ConversationalRetrievalChain.from_llm(llm=llm, retriever=retriever, qa_prompt=PROMPT, return_source_documents=True)
   return qa
