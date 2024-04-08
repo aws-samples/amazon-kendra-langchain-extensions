@@ -1,16 +1,14 @@
-import streamlit as st
-import uuid
 import sys
+import uuid
 
 import kendra_chat_anthropic as anthropic
-import kendra_chat_open_ai as openai
+import kendra_chat_bedrock_claudev2 as bedrock_claudev2
+import kendra_chat_bedrock_claudev3 as bedrock_claudev3
+import kendra_chat_bedrock_titan as bedrock_titan
 import kendra_chat_falcon_40b as falcon40b
 import kendra_chat_llama_2 as llama2
-import kendra_chat_bedrock_titan as bedrock_titan
-import kendra_chat_bedrock_claude as bedrock_claude
-import kendra_chat_bedrock_claudev2 as bedrock_claudev2
-
-
+import kendra_chat_open_ai as openai
+import streamlit as st
 
 USER_ICON = "images/user-icon.png"
 AI_ICON = "images/ai-icon.png"
@@ -63,10 +61,16 @@ if 'llm_chain' not in st.session_state:
         elif (sys.argv[1] == 'bedrock_claudev2'):
             st.session_state['llm_app'] = bedrock_claudev2
             st.session_state['llm_chain'] = bedrock_claudev2.build_chain()
+        elif (sys.argv[1] == 'bedrock_claudev3_haiku'):
+            st.session_state['llm_app'] = bedrock_claudev3
+            st.session_state['llm_chain'] = bedrock_claudev3.build_chain_haiku()
+        elif (sys.argv[1] == 'bedrock_claudev3_sonnet'):
+            st.session_state['llm_app'] = bedrock_claudev3
+            st.session_state['llm_chain'] = bedrock_claudev3.build_chain_sonnet()
         else:
             raise Exception("Unsupported LLM: ", sys.argv[1])
     else:
-        raise Exception("Usage: streamlit run app.py <anthropic|flanxl|flanxxl|openai|falcon40b|llama2|bedrock_titan|bedrock_claude|bedrock_claudev2>")
+        raise Exception("Usage: streamlit run app.py <anthropic|flanxl|flanxxl|openai|falcon40b|llama2|bedrock_titan|bedrock_claudev2|bedrock_claudev3_haiku|bedrock_claudev3_sonnet>")
 
 if 'chat_history' not in st.session_state:
     st.session_state['chat_history'] = []
