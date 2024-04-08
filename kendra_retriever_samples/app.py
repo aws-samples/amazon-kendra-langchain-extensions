@@ -60,9 +60,6 @@ if 'llm_chain' not in st.session_state:
         elif (sys.argv[1] == 'bedrock_titan'):
             st.session_state['llm_app'] = bedrock_titan
             st.session_state['llm_chain'] = bedrock_titan.build_chain()
-        elif (sys.argv[1] == 'bedrock_claude'):
-            st.session_state['llm_app'] = bedrock_claude
-            st.session_state['llm_chain'] = bedrock_claude.build_chain()
         elif (sys.argv[1] == 'bedrock_claudev2'):
             st.session_state['llm_app'] = bedrock_claudev2
             st.session_state['llm_chain'] = bedrock_claudev2.build_chain()
