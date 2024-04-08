@@ -4,6 +4,7 @@ import uuid
 import kendra_chat_anthropic as anthropic
 import kendra_chat_bedrock_claudev2 as bedrock_claudev2
 import kendra_chat_bedrock_claudev3 as bedrock_claudev3
+import kendra_chat_bedrock_llama2 as bedrock_llama2
 import kendra_chat_bedrock_titan as bedrock_titan
 import kendra_chat_falcon_40b as falcon40b
 import kendra_chat_llama_2 as llama2
@@ -67,10 +68,16 @@ if 'llm_chain' not in st.session_state:
         elif (sys.argv[1] == 'bedrock_claudev3_sonnet'):
             st.session_state['llm_app'] = bedrock_claudev3
             st.session_state['llm_chain'] = bedrock_claudev3.build_chain_sonnet()
+        elif (sys.argv[1] == 'bedrock_llama2_70b'):
+            st.session_state['llm_app'] = bedrock_llama2
+            st.session_state['llm_chain'] = bedrock_llama2.build_chain_llama2_70B()
+        elif (sys.argv[1] == 'bedrock_llama2_13b'):
+            st.session_state['llm_app'] = bedrock_llama2
+            st.session_state['llm_chain'] = bedrock_llama2.build_chain_llama2_13B()
         else:
             raise Exception("Unsupported LLM: ", sys.argv[1])
     else:
-        raise Exception("Usage: streamlit run app.py <anthropic|flanxl|flanxxl|openai|falcon40b|llama2|bedrock_titan|bedrock_claudev2|bedrock_claudev3_haiku|bedrock_claudev3_sonnet>")
+        raise Exception("Usage: streamlit run app.py <anthropic|flanxl|flanxxl|openai|falcon40b|llama2|bedrock_titan|bedrock_claudev2|bedrock_claudev3_haiku|bedrock_claudev3_sonnet|llama2_70b|llama2_13b>")
 
 if 'chat_history' not in st.session_state:
     st.session_state['chat_history'] = []

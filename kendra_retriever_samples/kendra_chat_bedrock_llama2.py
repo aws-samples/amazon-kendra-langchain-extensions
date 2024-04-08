@@ -26,16 +26,16 @@ class bcolors:
 
 
 MAX_HISTORY_LENGTH = 5
-MODEL_ID_SONNET = "anthropic.claude-3-sonnet-20240229-v1:0"
-MODEL_ID_HAIKU = "anthropic.claude-3-haiku-20240307-v1:0"
+MODEL_ID_70B = "meta.llama2-70b-chat-v1"
+MODEL_ID_13B = "meta.llama2-13b-chat-v1"
 
 
-def build_chain_sonnet():
-    return build_chain(MODEL_ID_SONNET)
+def build_chain_llama2_70B():
+    return build_chain(MODEL_ID_70B)
 
 
-def build_chain_haiku():
-    return build_chain(MODEL_ID_HAIKU)
+def build_chain_llama2_13B():
+    return build_chain(MODEL_ID_13B)
 
 
 def build_chain(model_id):
@@ -51,46 +51,41 @@ def build_chain(model_id):
         model_id=model_id, 
         client=bedrock_client, 
         model_kwargs={ 
-            "max_tokens": 2048,
+            "max_gen_len": 2048,
             "temperature": 1,
-            "top_k": 250,
             "top_p": 0.999,
-            "stop_sequences": ["\n\nHuman"],
         }
     )
     retriever = AmazonKendraRetriever(
         index_id=kendra_index_id, top_k=5, region_name=region
     )
 
-    prompt_template = """Human: This is a friendly conversation between a human and an AI. 
-  The AI is talkative and provides specific details from its context but limits it to 240 tokens.
+    prompt_template = """
+  <s>[INST] <<SYS>>
+  The following is a friendly conversation between a human and an AI. 
+  The AI is talkative and provides lots of specific details from its context.
   If the AI does not know the answer to a question, it truthfully says it 
   does not know.
-
-  Assistant: OK, got it, I'll be a talkative truthful AI assistant.
-
-  Human: Here are a few documents in <documents> tags:
-  <documents>
   {context}
-  </documents>
-  Based on the above documents, provide a detailed answer for, {question} 
-  Answer "don't know" if not present in the document. 
-
-  Assistant:
-  """
+  <</SYS>>
+  Instruction: Based on the above documents, provide a detailed answer for, {question} Answer "don't know" 
+  if not present in the document. 
+  Solution:
+  [/INST]"""
     PROMPT = PromptTemplate(
-        template=prompt_template, input_variables=["context", "question"]
+        template=prompt_template, input_variables=["context", "question"],
     )
-
-    condense_qa_template = """{chat_history}
-  Human:
-  Given the previous conversation and a follow up question below, rephrase the follow up question
+    condense_qa_template = """
+  <s>[INST] <<SYS>>
+  Given the following conversation and a follow up question, rephrase the follow up question 
   to be a standalone question.
 
-  Follow Up Question: {question}
-  Standalone Question:
+  Chat History:
+  {chat_history}
+  Follow Up Input: {question}
+    <</SYS>>
+  Standalone question:  [/INST]"""
 
-  Assistant:"""
     standalone_question_prompt = PromptTemplate.from_template(condense_qa_template)
 
     qa = ConversationalRetrievalChain.from_llm(
