@@ -52,6 +52,10 @@ The model id for the LLMs are specified in the table below.
 | Bedrock Titan | None | | | bedrock_titan |
 | Bedrock Claude | None | | | bedrock_claude |
 | Bedrock Claude V2 | None | | | bedrock_claudev2 |
+| Bedrock Claude V3 Haiku | None | | | bedrock_claudev3_haiku |
+| Bedrock Claude V3 Sonnet | None | | | bedrock_claudev3_sonnet |
+| Bedrock Llama2 13b | None | | | bedrock_llama2_13b |
+| Bedrock Llama2 70b | None | | | bedrock_llama2_70b |
 
 After deploying the LLM, set up environment variables for kendra id, aws region, endpoint name (or the API key for an external provider), and optionally the inference component name.
 
