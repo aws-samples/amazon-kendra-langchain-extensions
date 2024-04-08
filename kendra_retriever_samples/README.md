@@ -50,7 +50,6 @@ The model id for the LLMs are specified in the table below.
 | Falcon 40B instruct | FALCON_40B_ENDPOINT, INFERENCE_COMPONENT_NAME | <Endpoint_name> | <Inference_component_name> | falcon40b |
 | Llama2 70B instruct | LLAMA_2_ENDPOINT, INFERENCE_COMPONENT_NAME | <Endpoint_name> | <Inference_component_name> | llama2 |
 | Bedrock Titan | None | | | bedrock_titan |
-| Bedrock Claude | None | | | bedrock_claude |
 | Bedrock Claude V2 | None | | | bedrock_claudev2 |
 | Bedrock Claude V3 Haiku | None | | | bedrock_claudev3_haiku |
 | Bedrock Claude V3 Sonnet | None | | | bedrock_claudev3_sonnet |
