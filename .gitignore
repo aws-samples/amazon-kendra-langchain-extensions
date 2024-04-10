@@ -86,3 +86,4 @@ dmypy.json
 
 # venv files
 env*
+.venv
