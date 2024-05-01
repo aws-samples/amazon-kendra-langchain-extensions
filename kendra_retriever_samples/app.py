@@ -8,6 +8,7 @@ import kendra_chat_bedrock_llama2 as bedrock_llama2
 import kendra_chat_bedrock_titan as bedrock_titan
 import kendra_chat_falcon_40b as falcon40b
 import kendra_chat_llama_2 as llama2
+import kendra_chat_llama_2_neuron as llama2_n
 import kendra_chat_open_ai as openai
 import streamlit as st
 
@@ -56,6 +57,9 @@ if 'llm_chain' not in st.session_state:
         elif (sys.argv[1] == 'llama2'):
             st.session_state['llm_app'] = llama2
             st.session_state['llm_chain'] = llama2.build_chain()
+        elif (sys.argv[1] == 'llama2_n'):
+            st.session_state['llm_app'] = llama2_n
+            st.session_state['llm_chain'] = llama2_n.build_chain()    
         elif (sys.argv[1] == 'bedrock_titan'):
             st.session_state['llm_app'] = bedrock_titan
             st.session_state['llm_chain'] = bedrock_titan.build_chain()
