@@ -1,5 +1,5 @@
 # AWS Langchain
-This repo provides a set of samples to work with [Langchain](https://github.com/hwchase17/langchain/tree/master) and Amazon Kendra. It currently has samples for working with a [Kendra retriever class](https://python.langchain.com/docs/modules/data_connection/retrievers/integrations/amazon_kendra_retriever) to execute a QA chain for SageMaker, Open AI and Anthropic providers. 
+This repo provides a set of samples to work with [Langchain](https://github.com/hwchase17/langchain/tree/master) and Amazon Kendra. It currently has samples for working with a [Kendra retriever class](https://python.langchain.com/docs/integrations/retrievers/amazon_kendra_retriever) to execute a QA chain for SageMaker, Open AI and Anthropic providers. 
 
 ## Installing
 
@@ -50,8 +50,11 @@ The model id for the LLMs are specified in the table below.
 | Falcon 40B instruct | FALCON_40B_ENDPOINT, INFERENCE_COMPONENT_NAME | <Endpoint_name> | <Inference_component_name> | falcon40b |
 | Llama2 70B instruct | LLAMA_2_ENDPOINT, INFERENCE_COMPONENT_NAME | <Endpoint_name> | <Inference_component_name> | llama2 |
 | Bedrock Titan | None | | | bedrock_titan |
-| Bedrock Claude | None | | | bedrock_claude |
 | Bedrock Claude V2 | None | | | bedrock_claudev2 |
+| Bedrock Claude V3 Haiku | None | | | bedrock_claudev3_haiku |
+| Bedrock Claude V3 Sonnet | None | | | bedrock_claudev3_sonnet |
+| Bedrock Llama2 13b | None | | | bedrock_llama2_13b |
+| Bedrock Llama2 70b | None | | | bedrock_llama2_70b |
 
 After deploying the LLM, set up environment variables for kendra id, aws region, endpoint name (or the API key for an external provider), and optionally the inference component name.
 
