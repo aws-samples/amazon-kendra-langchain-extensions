@@ -76,6 +76,10 @@ export ANTHROPIC_API_KEY=<YOUR-ANTHROPIC-API-KEY> #  only if you are using Anthr
 ```
 
 
+**NOTE**: If you're using individual sample codes outside of the code structure in this repository, please make sure you have installed `boto3` (by running `pip install boto3` or use the `*requirements.txt*` file ) in your python runtime or **AmazonKendaraRetriver** will not work with the langchain Retrieve Interfaces.
+
+
+
 ### Running samples from the streamlit app
 The samples directory is bundled with an `app.py` file that can be run as a web app using streamlit. 
 
